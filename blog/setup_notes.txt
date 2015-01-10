@@ -17,3 +17,4 @@ ruby fails
 Via (http://stackoverflow.com/questions/25255372/error-spawn-enoent-missing-the-sass-executable)
 sudo gem install sass
 
+http://kylezeeuwen.github.io/gymsym/

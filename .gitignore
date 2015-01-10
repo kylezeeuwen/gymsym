@@ -1,2 +1,6 @@
-bower_components
+.sass-cache
+app/bower_components
+compiled
 node_modules
+test/.bowerrc
+test/bower_components
