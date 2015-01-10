@@ -1,0 +1,19 @@
+setup notes:
+
+My comp already has node npm yo bower gunt-cli and a few others installed.
+Using Mac OSX Yosemite
+
+Scaffold out App
+mkdir gymsym
+cd gymsym
+yo gulp-webapp
+npm install --save sass
+
+See if all deps are installed
+gulp
+
+ruby fails
+
+Via (http://stackoverflow.com/questions/25255372/error-spawn-enoent-missing-the-sass-executable)
+sudo gem install sass
+
