@@ -11,21 +11,46 @@ angular.module('gymsym').factory 'Gym', () ->
       new Gym()
 
     constructor: () ->
-      @racks = []
+      @rack = null
+      @clients = []
+      @time = 0
       @uniqId = Gym.getNewId()
 
     id: () ->
       @uniqId
 
-    addRack: (rack) ->
-      @racks.push rack
+    setRack: (rack) ->
+      @rack = rack
+
+    addClient: (client) ->
+      @clients.push client
+      client.startWorkout @rack
+
+    removeClient: (exitingClient) ->
+      #TODO clients should be dictionary by ID ?
+      @clients = _.filter @clients, (client) -> 
+        client.id() != exitingClient.id()
+
+    advanceTime: () ->
+      @time += 1
+
+      for client in @clients
+        newStatus = client.advanceTime(@time)
+        if newStatus is 'finished'
+          @removeClient client
+
+      #console.log "Time #{@time}"
+      #console.log @dump()
+      #console.log JSON.stringify @dump().clients
 
     dump: () ->
       data =
-        racks: []
-
-      for rack in @racks
-        data.racks.push rack.dump()
+        clients: []
+        rack: @rack.dump()
+        time: @time
+        
+      for client in @clients
+        data.clients.push client.dump()
 
       data
 

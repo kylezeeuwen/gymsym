@@ -1,22 +1,24 @@
-angular.module('gymsym').factory 'Client', () ->
+angular.module('gymsym').factory 'Client', (AverageJoeClient, RandomClient) ->
 
   class Client
-    @curMaxId: 0
+    @curMaxId: -1
 
     @getNewId: () ->
       @curMaxId++
       @curMaxId
 
-    @create: (name, program) ->
-      new Rack(name, program)
+    @getClientClass: (type) ->
+      types =
+        AverageJoe: AverageJoeClient
+        Random: RandomClient
 
-    constructor: (name, program) ->
-      @props =
-        name: name
-        program: program
-      @uniqId = Client.getNewId()
-
-    id: () ->
-      @uniqId
+      clientClass = types[type]
+      throw new Error "Invalid client type #{type}" unless clientClass
+      
+      clientClass
+    
+    @create: (name, type, program) ->
+      newId = Client.getNewId()
+      Client.getClientClass(type).create(newId, name, program)
 
   Client

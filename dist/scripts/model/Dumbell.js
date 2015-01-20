@@ -28,6 +28,13 @@
         return this.props.weight;
       };
 
+      Dumbell.prototype.dump = function() {
+        return {
+          weight: this.props.weight,
+          id: this.uniqId
+        };
+      };
+
       return Dumbell;
 
     })();

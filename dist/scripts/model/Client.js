@@ -1,28 +1,33 @@
 (function() {
-  angular.module('gymsym').factory('Client', function() {
+  angular.module('gymsym').factory('Client', function(AverageJoeClient, RandomClient) {
     var Client;
     Client = (function() {
-      Client.curMaxId = 0;
+      function Client() {}
+
+      Client.curMaxId = -1;
 
       Client.getNewId = function() {
         this.curMaxId++;
         return this.curMaxId;
       };
 
-      Client.create = function(name, program) {
-        return new Rack(name, program);
+      Client.getClientClass = function(type) {
+        var clientClass, types;
+        types = {
+          AverageJoe: AverageJoeClient,
+          Random: RandomClient
+        };
+        clientClass = types[type];
+        if (!clientClass) {
+          throw new Error("Invalid client type " + type);
+        }
+        return clientClass;
       };
 
-      function Client(name, program) {
-        this.props = {
-          name: name,
-          program: program
-        };
-        this.uniqId = Client.getNewId();
-      }
-
-      Client.prototype.id = function() {
-        return this.uniqId;
+      Client.create = function(name, type, program) {
+        var newId;
+        newId = Client.getNewId();
+        return Client.getClientClass(type).create(newId, name, program);
       };
 
       return Client;

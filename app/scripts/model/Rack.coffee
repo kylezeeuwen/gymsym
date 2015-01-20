@@ -33,13 +33,13 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
 
     validateSlotIndex: (slotIndex) ->
       if not (typeof slotIndex is 'number')
-        throw new Error 'invalid slotIndex'
+        throw new Error "invalid slotIndex '#{slotIndex}'"
 
       if isNaN slotIndex
-        throw new Error 'invalid slotIndex'
+        throw new Error "invalid slotIndex '#{slotIndex}'"
 
       if slotIndex < 0 or slotIndex >= @numSlots
-        throw new Error 'slotIndex out of range'
+        throw new Error "slotIndex '#{slotIndex}' out of range"
 
     putDumbell: (slotIndexArg,dumbell) ->
       if not (dumbell instanceof Dumbell)
@@ -54,7 +54,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       
       @spaces[slotIndex]['dumbell'] = dumbell
 
-    takeDumbell: (slotIndexArg) ->
+    takeFromSlot: (slotIndexArg) ->
       slotIndex = parseInt(slotIndexArg)
 
       @validateSlotIndex slotIndex
@@ -68,18 +68,58 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
 
       return dumbell
 
-    hasWeight: (weight) ->
-      if @getSlotIndexesForWeight(weight).length > 0
-        true
-      else
-        false
+    hasWeights: (requiredWeights) ->
+      availableWeights = []
+      _.map @spaces, (space) ->
+        availableWeights.push space.dumbell.weight() if space.dumbell
 
+      hasAll = true
+      for weight in requiredWeights
+        index = _.indexOf availableWeights, weight
+        if index == -1
+          hasAll = false
+          break
+        else
+          availableWeights.splice index, 1
+
+      hasAll    
+
+    takeDumbells: (requiredWeights) ->
+      dumbells = []
+      for weight in requiredWeights
+        dumbells.push @takeFirstDumbellWithWeight weight
+
+      dumbells
+
+    # TODO test
+    takeFirstDumbellWithWeight: (weight) ->
+      indexes = @getSlotIndexesForWeight weight
+      unless indexes.length > 0
+        throw new Error "cannot takeFirstDumbellWithWeight(#{weight}): no dumbell available"
+      @takeFromSlot indexes[0]
+
+    # TODO change weight to dumbell in name of function
     getSlotIndexesForWeight: (weight) ->
       indexes = []
       for index, space of @spaces
         indexes.push(parseInt index) if space.dumbell?.weight() == weight
 
       indexes
+
+    getEmptySlotsForDumbell: (dumbell) ->
+
+      if dumbell and not(dumbell instanceof Dumbell)
+        throw new 'invalid dumbell: not a Dumbell'
+
+      slots = []
+      for space,index in @spaces
+        if not space['dumbell']
+          if (not dumbell) or dumbell.weight() == space.label
+            slots.push index
+      slots
+
+    getEmptySlots: () ->
+      @getEmptySlotsForDumbell null
 
     dump: () ->
       id = @id()
