@@ -30,6 +30,7 @@ module.exports = function (config) {
     files: [
       '../../dist/bower_components/angular/angular.js',
       '../../dist/bower_components/angular-ui-router/release/angular-ui-router.js',
+      '../../dist/bower_components/lodash/dist/lodash.compat.js',
       '../../node_modules/angular-mocks/angular-mocks.js',
       '../../dist/scripts/**/*.js',
       '../../compiled/test/spec/**/*Spec.js'
