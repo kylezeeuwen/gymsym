@@ -97,11 +97,43 @@
         }
       };
 
+      Rack.prototype.hasWeights = function(requiredWeights) {
+        var availableWeights, hasAll, index, weight, _i, _len;
+        availableWeights = [];
+        _.map(this.spaces, function(space) {
+          if (space.dumbell) {
+            return availableWeights.push(space.dumbell.weight());
+          }
+        });
+        hasAll = true;
+        for (_i = 0, _len = requiredWeights.length; _i < _len; _i++) {
+          weight = requiredWeights[_i];
+          index = _.indexOf(availableWeights, weight);
+          if (index === -1) {
+            hasAll = false;
+            break;
+          } else {
+            availableWeights.splice(index, 1);
+          }
+        }
+        return hasAll;
+      };
+
+      Rack.prototype.takeDumbellsWithWeights = function(requiredWeights) {
+        var dumbells, weight, _i, _len;
+        dumbells = [];
+        for (_i = 0, _len = requiredWeights.length; _i < _len; _i++) {
+          weight = requiredWeights[_i];
+          dumbells.push(this.takeFirstDumbellWithWeight(weight));
+        }
+        return dumbells;
+      };
+
       Rack.prototype.takeFirstDumbellWithWeight = function(weight) {
         var indexes;
         indexes = this.getSlotIndexesForWeight(weight);
         if (!(indexes.length > 0)) {
-          throw new error("cannot takeFirstDumbellWithWeight(" + weight + "): no dumbell available");
+          throw new Error("cannot takeFirstDumbellWithWeight(" + weight + "): no dumbell available");
         }
         return this.takeDumbell(indexes[0]);
       };

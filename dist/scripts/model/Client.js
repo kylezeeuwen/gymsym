@@ -39,13 +39,14 @@
       };
 
       Client.prototype.transitionsFromIdle = function() {
-        var dumbell, nextExercise, requiredDumbells;
+        var dumbells, nextExercise, requiredWeights;
         nextExercise = this.getNextExercise();
         if (nextExercise) {
-          requiredDumbells = nextExercise.dumbells;
-          if (this.rack.hasWeight(requiredDumbells[0])) {
-            dumbell = this.rack.takeFirstDumbellWithWeight(requiredDumbells[0]);
-            return this.startExercise(nextExercise, dumbell);
+          requiredWeights = nextExercise.dumbells;
+          if (this.rack.hasWeights(requiredWeights)) {
+            dumbells = this.rack.takeDumbellsWithWeights(requiredWeights);
+            console.log("got dumbells " + dumbells);
+            return this.startExercise(nextExercise, dumbells);
           }
         } else {
           return this.finishWorkout();
@@ -72,12 +73,12 @@
         return this.status = 'finished';
       };
 
-      Client.prototype.startExercise = function(exercise, dumbell) {
+      Client.prototype.startExercise = function(exercise, dumbells) {
         this.currentExercise = this.workoutPlan[exercise.id];
         this.currentExercise.status = 'active';
         this.currentExercise.startTime = this.time;
         this.status = 'exercising';
-        return this.dumbells.push(dumbell);
+        return this.dumbells = this.dumbells.concat(dumbells);
       };
 
       Client.prototype.finishExercise = function() {

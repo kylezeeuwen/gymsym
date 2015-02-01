@@ -33,11 +33,12 @@ angular.module('gymsym').factory 'Client', () ->
     transitionsFromIdle: () ->
       nextExercise = @getNextExercise()
       if nextExercise
-        requiredDumbells = nextExercise.dumbells
+        requiredWeights = nextExercise.dumbells
         #TODO extend for multiple dumbells
-        if @rack.hasWeight requiredDumbells[0]
-          dumbell = @rack.takeFirstDumbellWithWeight requiredDumbells[0]
-          @startExercise nextExercise, dumbell
+        if @rack.hasWeights requiredWeights
+          dumbells = @rack.takeDumbellsWithWeights requiredWeights
+          console.log "got dumbells #{dumbells}"
+          @startExercise nextExercise, dumbells
 
       else
         @finishWorkout()
@@ -57,14 +58,14 @@ angular.module('gymsym').factory 'Client', () ->
     finishWorkout: () ->
       @status = 'finished'
 
-    startExercise: (exercise, dumbell) ->
+    startExercise: (exercise, dumbells) ->
       @currentExercise = @workoutPlan[exercise.id]
       @currentExercise.status = 'active'
       @currentExercise.startTime = @time
 
       @status = 'exercising'
 
-      @dumbells.push dumbell
+      @dumbells = @dumbells.concat dumbells
 
     finishExercise: () ->
       @currentExercise.status = 'complete'

@@ -74,11 +74,34 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       else
         false
 
+    hasWeights: (requiredWeights) ->
+      availableWeights = []
+      _.map @spaces, (space) ->
+        availableWeights.push space.dumbell.weight() if space.dumbell
+
+      hasAll = true
+      for weight in requiredWeights
+        index = _.indexOf availableWeights, weight
+        if index == -1
+          hasAll = false
+          break
+        else
+          availableWeights.splice index, 1
+
+      hasAll    
+
+    takeDumbellsWithWeights: (requiredWeights) ->
+      dumbells = []
+      for weight in requiredWeights
+        dumbells.push @takeFirstDumbellWithWeight weight
+
+      dumbells
+
     # TODO test
     takeFirstDumbellWithWeight: (weight) ->
       indexes = @getSlotIndexesForWeight weight
       unless indexes.length > 0
-        throw new error "cannot takeFirstDumbellWithWeight(#{weight}): no dumbell available"
+        throw new Error "cannot takeFirstDumbellWithWeight(#{weight}): no dumbell available"
       @takeDumbell indexes[0]
 
     # TODO change weight to dumbell in name of function
