@@ -54,13 +54,13 @@
 
       Rack.prototype.validateSlotIndex = function(slotIndex) {
         if (!(typeof slotIndex === 'number')) {
-          throw new Error('invalid slotIndex');
+          throw new Error("invalid slotIndex '" + slotIndex + "'");
         }
         if (isNaN(slotIndex)) {
-          throw new Error('invalid slotIndex');
+          throw new Error("invalid slotIndex '" + slotIndex + "'");
         }
         if (slotIndex < 0 || slotIndex >= this.numSlots) {
-          throw new Error('slotIndex out of range');
+          throw new Error("slotIndex '" + slotIndex + "' out of range");
         }
       };
 
@@ -95,6 +95,15 @@
         } else {
           return false;
         }
+      };
+
+      Rack.prototype.takeFirstDumbellWithWeight = function(weight) {
+        var indexes;
+        indexes = this.getSlotIndexesForWeight(weight);
+        if (!(indexes.length > 0)) {
+          throw new error("cannot takeFirstDumbellWithWeight(" + weight + "): no dumbell available");
+        }
+        return this.takeDumbell(indexes[0]);
       };
 
       Rack.prototype.getSlotIndexesForWeight = function(weight) {

@@ -33,13 +33,13 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
 
     validateSlotIndex: (slotIndex) ->
       if not (typeof slotIndex is 'number')
-        throw new Error 'invalid slotIndex'
+        throw new Error "invalid slotIndex '#{slotIndex}'"
 
       if isNaN slotIndex
-        throw new Error 'invalid slotIndex'
+        throw new Error "invalid slotIndex '#{slotIndex}'"
 
       if slotIndex < 0 or slotIndex >= @numSlots
-        throw new Error 'slotIndex out of range'
+        throw new Error "slotIndex '#{slotIndex}' out of range"
 
     putDumbell: (slotIndexArg,dumbell) ->
       if not (dumbell instanceof Dumbell)
@@ -74,6 +74,14 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       else
         false
 
+    # TODO test
+    takeFirstDumbellWithWeight: (weight) ->
+      indexes = @getSlotIndexesForWeight weight
+      unless indexes.length > 0
+        throw new error "cannot takeFirstDumbellWithWeight(#{weight}): no dumbell available"
+      @takeDumbell indexes[0]
+
+    # TODO change weight to dumbell in name of function
     getSlotIndexesForWeight: (weight) ->
       indexes = []
       for index, space of @spaces

@@ -16,12 +16,37 @@ angular.module('gymsym').factory 'Client', () ->
       @uniqId = Client.getNewId()
       @status = 'idle'
       @currentExercise = null
-
+      @dumbells = []
+    
     getNextExercise: () ->
+      _.findWhere @workoutPlan, status: 'pending'
 
-    workoutComplete: () ->
+    getCurrentExercise: () ->
+      @currentExercise
+      
+    startWorkout: (startTime) ->
+      @startTime = startTime
 
-    advanceTime: () ->
+    finishWorkout: (endTime) ->
+      @endTime = endTime
+      @status = 'finished'
+
+    startExercise: (exercise, dumbell, startTime) ->
+      @currentExercise = @workoutPlan[exercise.id]
+      @currentExercise.status = 'active'
+      @currentExercise.startTime = startTime
+
+      @status = 'exercising'
+
+      @dumbells.push dumbell
+
+    finishExercise: (endTime) ->
+      @currentExercise.status = 'complete'
+      @currentExercise.endTime = endTime
+
+      @status = 'idle'
+
+      @dumbells = []
 
     validateWorkoutPlan: (workoutPlan) ->
       throw new Error 'workoutPlan must be array' unless workoutPlan instanceof Array
@@ -34,18 +59,27 @@ angular.module('gymsym').factory 'Client', () ->
         ex.duration = parseInt ex.duration
         throw new Error "#{place} invalid duraiton '#{ex.duration}'" unless _.isNumber ex.duration
 
-        throw new Error "#{place} missing weights" unless 'weights' of ex
-        throw new Error "#{place} weights must be array" unless ex.weights instanceof Array
-        for weight, wIndex in ex.weights
-          place = "workoutPlan[#{index}].weights[#{wIndex}]"
-          ex.weights[wIndex] = parseInt weight
-          throw new Error "#{place} invalid weight '#{ex.weights[wIndex]}'" unless _.isNumber ex.weights[wIndex]
+        throw new Error "#{place} missing dumbells" unless 'dumbells' of ex
+        throw new Error "#{place} dumbells must be array" unless ex.dumbells instanceof Array
+        for weight, wIndex in ex.dumbells
+          place = "workoutPlan[#{index}].dumbells[#{wIndex}]"
+          ex.dumbells[wIndex] = parseInt weight
+          throw new Error "#{place} invalid weight '#{ex.dumbells[wIndex]}'" unless _.isNumber ex.dumbells[wIndex]
         
+        #pending, active, complete
         ex.status = 'pending'
+        ex.id = index
 
       workoutPlan
 
     id: () ->
       @uniqId
+
+    dump: () ->
+      return {
+        name: @name
+        status: @status
+        dumbells: @dumbells
+      }
 
   Client

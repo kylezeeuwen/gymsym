@@ -20,7 +20,7 @@
           left: 19.5
         };
         scope.width = 500 - scope.margin.right;
-        scope.height = 500 - scope.margin.top - scope.margin.bottom;
+        scope.height = 150 - scope.margin.top - scope.margin.bottom;
         scope.svg = d3.select('#' + iElement.attr('id')).append('svg').attr('width', scope.width + scope.margin.left + scope.margin.right).attr('height', scope.height + scope.margin.top + scope.margin.bottom).append('g').attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')');
         return scope.rack = scope.svg.append('g').attr('class', 'rack');
       }

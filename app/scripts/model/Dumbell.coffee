@@ -11,6 +11,7 @@ angular.module('gymsym').factory 'Dumbell', () ->
       new Dumbell(weight)
 
     constructor: (weight) ->
+      #TODO: get rid of props 
       @props =
         weight: weight
       @uniqId = Dumbell.getNewId()

@@ -12,7 +12,7 @@ app.directive 'gymView', ->
     # dimensions
     scope.margin = {top: 19.5, right: 19.5, bottom: 19.5, left: 19.5}
     scope.width = 500 - scope.margin.right
-    scope.height = 500 - scope.margin.top - scope.margin.bottom
+    scope.height = 150 - scope.margin.top - scope.margin.bottom
 
     #Create the SVG container and set the origin.
     scope.svg = d3.select('#' + iElement.attr('id')).append('svg')
