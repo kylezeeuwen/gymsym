@@ -39,9 +39,9 @@ angular.module('gymsym').factory 'Gym', () ->
         if newStatus is 'finished'
           @removeClient client
 
-      console.log "Time #{@time}"
-      console.log @dump()
-      console.log JSON.stringify @dump().clients
+      #console.log "Time #{@time}"
+      #console.log @dump()
+      #console.log JSON.stringify @dump().clients
 
     dump: () ->
       data =

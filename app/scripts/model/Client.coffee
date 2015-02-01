@@ -115,6 +115,7 @@ angular.module('gymsym').factory 'Client', () ->
 
     dump: () ->
       return {
+        id: @id()
         name: @name
         status: @status
         dumbells: @dumbells

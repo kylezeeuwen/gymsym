@@ -40,19 +40,20 @@
       };
 
       Gym.prototype.advanceTime = function() {
-        var client, newStatus, _i, _len, _ref;
+        var client, newStatus, _i, _len, _ref, _results;
         this.time += 1;
         _ref = this.clients;
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           client = _ref[_i];
           newStatus = client.advanceTime(this.time);
           if (newStatus === 'finished') {
-            this.removeClient(client);
+            _results.push(this.removeClient(client));
+          } else {
+            _results.push(void 0);
           }
         }
-        console.log("Time " + this.time);
-        console.log(this.dump());
-        return console.log(JSON.stringify(this.dump().clients));
+        return _results;
       };
 
       Gym.prototype.dump = function() {

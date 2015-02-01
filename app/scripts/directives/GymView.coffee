@@ -24,6 +24,11 @@ app.directive 'gymView', ->
     scope.rack = scope.svg.append('g')
       .attr('class', 'rack')
 
+    scope.clientArea = scope.svg.append('g')
+      .attr('class', 'client-area')
+      .attr('transform', 'translate(10,70)')
+
+
 app.controller 'GymViewController', ($scope, $interval, $timeout) ->
 
   $scope.key = (d) ->
@@ -34,7 +39,10 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
 
   $scope.updateGym = (gymData) ->
     return unless 'rack' of gymData
-    rackData = gymData.rack
+    $scope.updateRack gymData.rack
+    $scope.updateClients gymData.clients
+
+  $scope.updateRack = (rackData) ->
 
     rackSpaces = $scope.rack.selectAll('.rack-space')
       .data(rackData, $scope.key)
@@ -96,5 +104,33 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .text( (d) ->
         d.weight
       )
+
+  $scope.updateClients = (clientData) ->
+
+    clients = $scope.clientArea.selectAll('.client-shape')
+      .data(clientData, $scope.key)
+
+    enteringClients = clients.enter().append('g')
+      .attr('class', 'client-container')
+      .attr('transform', (d) ->
+        x = d.id * 60 + 10
+        return 'translate(' + x + ',10)'
+      )
+
+    enteringClients.append('rect')
+      .attr('class', 'client-shape')
+      .attr('width', 10)
+      .attr('height', 10)
+      .attr('style', "stroke-width:3;stroke:rgb(0,0,0)")
+
+    allClients = $scope.clientArea.selectAll('.client-shape')
+      .data(clientData, $scope.key)
+      .attr('fill', (d) ->
+        if d.status is 'idle'
+          'green'
+        else if d.status is 'exercising'
+          'orange'
+      )
+
 
   $scope.$watch $scope.watchGym, $scope.updateGym, true

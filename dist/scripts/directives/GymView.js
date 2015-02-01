@@ -22,7 +22,8 @@
         scope.width = 500 - scope.margin.right;
         scope.height = 150 - scope.margin.top - scope.margin.bottom;
         scope.svg = d3.select('#' + iElement.attr('id')).append('svg').attr('width', scope.width + scope.margin.left + scope.margin.right).attr('height', scope.height + scope.margin.top + scope.margin.bottom).append('g').attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')');
-        return scope.rack = scope.svg.append('g').attr('class', 'rack');
+        scope.rack = scope.svg.append('g').attr('class', 'rack');
+        return scope.clientArea = scope.svg.append('g').attr('class', 'client-area').attr('transform', 'translate(10,70)');
       }
     };
   });
@@ -35,11 +36,14 @@
       return $scope.gym.dump();
     };
     $scope.updateGym = function(gymData) {
-      var AllDumbellText, allDumbellSlots, allRackSpaces, enteringRackSpaces, rackData, rackSpaces;
       if (!('rack' in gymData)) {
         return;
       }
-      rackData = gymData.rack;
+      $scope.updateRack(gymData.rack);
+      return $scope.updateClients(gymData.clients);
+    };
+    $scope.updateRack = function(rackData) {
+      var AllDumbellText, allDumbellSlots, allRackSpaces, enteringRackSpaces, rackSpaces;
       rackSpaces = $scope.rack.selectAll('.rack-space').data(rackData, $scope.key);
       enteringRackSpaces = rackSpaces.enter().append('g').attr('class', 'rack-space-container').attr('transform', function(d) {
         var x;
@@ -72,6 +76,23 @@
       });
       return AllDumbellText = $scope.rack.selectAll('.dumbell-text').data(rackData, $scope.key).text(function(d) {
         return d.weight;
+      });
+    };
+    $scope.updateClients = function(clientData) {
+      var allClients, clients, enteringClients;
+      clients = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key);
+      enteringClients = clients.enter().append('g').attr('class', 'client-container').attr('transform', function(d) {
+        var x;
+        x = d.id * 60 + 10;
+        return 'translate(' + x + ',10)';
+      });
+      enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 10).attr('style', "stroke-width:3;stroke:rgb(0,0,0)");
+      return allClients = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key).attr('fill', function(d) {
+        if (d.status === 'idle') {
+          return 'green';
+        } else if (d.status === 'exercising') {
+          return 'orange';
+        }
       });
     };
     return $scope.$watch($scope.watchGym, $scope.updateGym, true);
