@@ -4,7 +4,7 @@
     $scope.rack1.putDumbell(0, Dumbell.create(10));
     $scope.rack1.putDumbell(1, Dumbell.create(10));
     $scope.gym = Gym.create();
-    $scope.gym.addRack($scope.rack1);
+    $scope.gym.setRack($scope.rack1);
     $scope.intervals = {};
     $timeout(function() {
       return $scope.gym.advanceTime();
@@ -33,7 +33,7 @@
     }, 3000);
     return $timeout(function() {
       return $interval.cancel($scope.intervals['poop']);
-    }, 11000);
+    }, 14000);
   });
 
 }).call(this);

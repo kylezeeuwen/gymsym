@@ -21,7 +21,7 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
 #  , 7000
 
   $scope.gym = Gym.create()
-  $scope.gym.addRack $scope.rack1
+  $scope.gym.setRack $scope.rack1
   $scope.intervals = {}
 
   $timeout ->
@@ -49,4 +49,4 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
 
   $timeout ->
     $interval.cancel $scope.intervals['poop']
-  , 11000
+  , 14000

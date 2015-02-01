@@ -36,10 +36,10 @@
     };
     $scope.updateGym = function(gymData) {
       var AllDumbellText, allDumbellSlots, allRackSpaces, enteringRackSpaces, rackData, rackSpaces;
-      if (!(gymData.racks.length > 0)) {
+      if (!('rack' in gymData)) {
         return;
       }
-      rackData = gymData.racks[0];
+      rackData = gymData.rack;
       rackSpaces = $scope.rack.selectAll('.rack-space').data(rackData, $scope.key);
       enteringRackSpaces = rackSpaces.enter().append('g').attr('class', 'rack-space-container').attr('transform', function(d) {
         var x;

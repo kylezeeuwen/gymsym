@@ -119,6 +119,25 @@
         return indexes;
       };
 
+      Rack.prototype.getEmptySlotsForDumbell = function(dumbell) {
+        var index, slots, space, _i, _len, _ref;
+        slots = [];
+        _ref = this.spaces;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          space = _ref[index];
+          if (!space['dumbell']) {
+            if ((!dumbell) || dumbell.weight === space.label) {
+              slots.push(index);
+            }
+          }
+        }
+        return slots;
+      };
+
+      Rack.prototype.getEmptySlots = function() {
+        return this.getEmptySlotsForDumbell(null);
+      };
+
       Rack.prototype.dump = function() {
         var data, id, index, printSpace;
         id = this.id();

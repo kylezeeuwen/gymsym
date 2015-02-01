@@ -17,36 +17,73 @@ angular.module('gymsym').factory 'Client', () ->
       @status = 'idle'
       @currentExercise = null
       @dumbells = []
+      #get time from service dont pass it around
+      @time = 0
     
+    advanceTime: (time) ->
+      @time = time
+      switch @status
+        when "idle" then @transitionsFromIdle()
+        when "exercising" then @transitionsFromExercising()
+        else throw new Error "Invalid client state #{clientStatus} for client #{client.name} at time #{@time}"
+
+      @status
+
+    #TODO nest this via transitionsFromIdle ?
+    transitionsFromIdle: () ->
+      nextExercise = @getNextExercise()
+      if nextExercise
+        requiredDumbells = nextExercise.dumbells
+        #TODO extend for multiple dumbells
+        if @rack.hasWeight requiredDumbells[0]
+          dumbell = @rack.takeFirstDumbellWithWeight requiredDumbells[0]
+          @startExercise nextExercise, dumbell
+
+      else
+        @finishWorkout()
+
+    transitionsFromExercising: (client) ->
+      if @currentExercise.startTime + @currentExercise.duration < @time
+        #TODO This is where client needs access to rack via gym
+        @finishExercise()
+
     getNextExercise: () ->
       _.findWhere @workoutPlan, status: 'pending'
 
-    getCurrentExercise: () ->
-      @currentExercise
-      
-    startWorkout: (startTime) ->
-      @startTime = startTime
+    startWorkout: (rack) ->
+      #TODO is there shorthand for this assignment stuff
+      @rack = rack
 
-    finishWorkout: (endTime) ->
-      @endTime = endTime
+    finishWorkout: () ->
       @status = 'finished'
 
-    startExercise: (exercise, dumbell, startTime) ->
+    startExercise: (exercise, dumbell) ->
       @currentExercise = @workoutPlan[exercise.id]
       @currentExercise.status = 'active'
-      @currentExercise.startTime = startTime
+      @currentExercise.startTime = @time
 
       @status = 'exercising'
 
       @dumbells.push dumbell
 
-    finishExercise: (endTime) ->
+    finishExercise: () ->
       @currentExercise.status = 'complete'
-      @currentExercise.endTime = endTime
+      @currentExercise.endTime = @time
+
+      @returnDumbells()
 
       @status = 'idle'
 
-      @dumbells = []
+    returnDumbells: () ->
+      while dumbell = @dumbells.shift()
+        availableCorrectSlots = @rack.getEmptySlotsForDumbell dumbell
+        availableSlots = @rack.getEmptySlots()
+        if availableCorrectSlots.length > 0
+          @rack.putDumbell availableCorrectSlots[0], dumbell
+        else if availableSlots.length > 0
+          @rack.putDumbell availableSlots[0], dumbell
+        else
+          throw new Error "Cannot return dumbell #{dumbell}: rack is full"
 
     validateWorkoutPlan: (workoutPlan) ->
       throw new Error 'workoutPlan must be array' unless workoutPlan instanceof Array

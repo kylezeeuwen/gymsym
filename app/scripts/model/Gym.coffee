@@ -11,7 +11,7 @@ angular.module('gymsym').factory 'Gym', () ->
       new Gym()
 
     constructor: () ->
-      @racks = []
+      @rack = null
       @clients = []
       @time = 0
       @uniqId = Gym.getNewId()
@@ -19,15 +19,14 @@ angular.module('gymsym').factory 'Gym', () ->
     id: () ->
       @uniqId
 
-    addRack: (rack) ->
-      @racks.push rack
+    setRack: (rack) ->
+      @rack = rack
 
     addClient: (client) ->
       @clients.push client
-      client.startWorkout @time
+      client.startWorkout @rack
 
     removeClient: (exitingClient) ->
-      exitingClient.finishWorkout @time
       #TODO clients should be dictionary by ID ?
       @clients = _.filter @clients, (client) -> 
         client.id() != exitingClient.id()
@@ -36,52 +35,23 @@ angular.module('gymsym').factory 'Gym', () ->
       @time += 1
 
       for client in @clients
-        @updateClient(client)
+        newStatus = client.advanceTime(@time)
+        if newStatus is 'finished'
+          @removeClient client
 
       console.log "Time #{@time}"
       console.log @dump()
       console.log JSON.stringify @dump().clients
 
-    updateClient: (client) ->
-      clientStatus = client.status
-
-      switch clientStatus
-        when "idle" then @idleCode client
-        when "exercising" then @exercisingCode client
-        else throw new Error "Invalid client state #{clientStatus} for client #{client.name} at time #{@time}"
-
-    idleCode: (client) ->
-      nextExercise = client.getNextExercise()
-      if nextExercise
-        requiredDumbells = nextExercise.dumbells
-        #TODO Simplify gym down to one rack for now
-        for rack in @racks
-          #TODO extend for multiple dumbells
-          if rack.hasWeight requiredDumbells[0]
-            dumbell = rack.takeFirstDumbellWithWeight requiredDumbells[0]
-            client.startExercise nextExercise, dumbell, @time
-
-      else
-        @removeClient(client)
-
-    exercisingCode: (client) ->
-      currentExercise = client.getCurrentExercise()
-      if currentExercise.startTime + currentExercise.duration < @time
-        #TODO This is where client needs access to rack via gym
-        client.finishExercise @time
-
     dump: () ->
       data =
-        racks: []
         clients: []
 
       #XXX Add clients to dump
 
-      for rack in @racks
-        data.racks.push rack.dump()
+      data.rack = @rack.dump()
       for client in @clients
         data.clients.push client.dump()
-
 
       data
 

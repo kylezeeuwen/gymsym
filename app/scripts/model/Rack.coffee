@@ -89,6 +89,17 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
 
       indexes
 
+    getEmptySlotsForDumbell: (dumbell) ->
+      slots = []
+      for space,index in @spaces
+        if not space['dumbell']
+          if (not dumbell) or dumbell.weight == space.label
+            slots.push index
+      slots
+
+    getEmptySlots: () ->
+      @getEmptySlotsForDumbell null
+
     dump: () ->
       id = @id()
 

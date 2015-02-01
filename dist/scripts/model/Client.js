@@ -20,7 +20,43 @@
         this.status = 'idle';
         this.currentExercise = null;
         this.dumbells = [];
+        this.time = 0;
       }
+
+      Client.prototype.advanceTime = function(time) {
+        this.time = time;
+        switch (this.status) {
+          case "idle":
+            this.transitionsFromIdle();
+            break;
+          case "exercising":
+            this.transitionsFromExercising();
+            break;
+          default:
+            throw new Error("Invalid client state " + clientStatus + " for client " + client.name + " at time " + this.time);
+        }
+        return this.status;
+      };
+
+      Client.prototype.transitionsFromIdle = function() {
+        var dumbell, nextExercise, requiredDumbells;
+        nextExercise = this.getNextExercise();
+        if (nextExercise) {
+          requiredDumbells = nextExercise.dumbells;
+          if (this.rack.hasWeight(requiredDumbells[0])) {
+            dumbell = this.rack.takeFirstDumbellWithWeight(requiredDumbells[0]);
+            return this.startExercise(nextExercise, dumbell);
+          }
+        } else {
+          return this.finishWorkout();
+        }
+      };
+
+      Client.prototype.transitionsFromExercising = function(client) {
+        if (this.currentExercise.startTime + this.currentExercise.duration < this.time) {
+          return this.finishExercise();
+        }
+      };
 
       Client.prototype.getNextExercise = function() {
         return _.findWhere(this.workoutPlan, {
@@ -28,32 +64,44 @@
         });
       };
 
-      Client.prototype.getCurrentExercise = function() {
-        return this.currentExercise;
+      Client.prototype.startWorkout = function(rack) {
+        return this.rack = rack;
       };
 
-      Client.prototype.startWorkout = function(startTime) {
-        return this.startTime = startTime;
-      };
-
-      Client.prototype.finishWorkout = function(endTime) {
-        this.endTime = endTime;
+      Client.prototype.finishWorkout = function() {
         return this.status = 'finished';
       };
 
-      Client.prototype.startExercise = function(exercise, dumbell, startTime) {
+      Client.prototype.startExercise = function(exercise, dumbell) {
         this.currentExercise = this.workoutPlan[exercise.id];
         this.currentExercise.status = 'active';
-        this.currentExercise.startTime = startTime;
+        this.currentExercise.startTime = this.time;
         this.status = 'exercising';
         return this.dumbells.push(dumbell);
       };
 
-      Client.prototype.finishExercise = function(endTime) {
+      Client.prototype.finishExercise = function() {
         this.currentExercise.status = 'complete';
-        this.currentExercise.endTime = endTime;
-        this.status = 'idle';
-        return this.dumbells = [];
+        this.currentExercise.endTime = this.time;
+        this.returnDumbells();
+        return this.status = 'idle';
+      };
+
+      Client.prototype.returnDumbells = function() {
+        var availableCorrectSlots, availableSlots, dumbell, _results;
+        _results = [];
+        while (dumbell = this.dumbells.shift()) {
+          availableCorrectSlots = this.rack.getEmptySlotsForDumbell(dumbell);
+          availableSlots = this.rack.getEmptySlots();
+          if (availableCorrectSlots.length > 0) {
+            _results.push(this.rack.putDumbell(availableCorrectSlots[0], dumbell));
+          } else if (availableSlots.length > 0) {
+            _results.push(this.rack.putDumbell(availableSlots[0], dumbell));
+          } else {
+            throw new Error("Cannot return dumbell " + dumbell + ": rack is full");
+          }
+        }
+        return _results;
       };
 
       Client.prototype.validateWorkoutPlan = function(workoutPlan) {

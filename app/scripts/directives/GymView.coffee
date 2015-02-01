@@ -33,8 +33,8 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     $scope.gym.dump()
 
   $scope.updateGym = (gymData) ->
-    return unless gymData.racks.length > 0
-    rackData = gymData.racks[0]
+    return unless 'rack' of gymData
+    rackData = gymData.rack
 
     rackSpaces = $scope.rack.selectAll('.rack-space')
       .data(rackData, $scope.key)
