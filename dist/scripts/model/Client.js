@@ -2,7 +2,7 @@
   angular.module('gymsym').factory('Client', function() {
     var Client;
     Client = (function() {
-      Client.curMaxId = 0;
+      Client.curMaxId = -1;
 
       Client.getNewId = function() {
         this.curMaxId++;
@@ -45,7 +45,6 @@
           requiredWeights = nextExercise.dumbells;
           if (this.rack.hasWeights(requiredWeights)) {
             dumbells = this.rack.takeDumbellsWithWeights(requiredWeights);
-            console.log("got dumbells " + dumbells);
             return this.startExercise(nextExercise, dumbells);
           }
         } else {

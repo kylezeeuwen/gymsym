@@ -1,7 +1,7 @@
 angular.module('gymsym').factory 'Client', () ->
 
   class Client
-    @curMaxId: 0
+    @curMaxId: -1
 
     @getNewId: () ->
       @curMaxId++
@@ -37,7 +37,6 @@ angular.module('gymsym').factory 'Client', () ->
         #TODO extend for multiple dumbells
         if @rack.hasWeights requiredWeights
           dumbells = @rack.takeDumbellsWithWeights requiredWeights
-          console.log "got dumbells #{dumbells}"
           @startExercise nextExercise, dumbells
 
       else

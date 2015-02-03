@@ -23,7 +23,7 @@
         scope.height = 150 - scope.margin.top - scope.margin.bottom;
         scope.svg = d3.select('#' + iElement.attr('id')).append('svg').attr('width', scope.width + scope.margin.left + scope.margin.right).attr('height', scope.height + scope.margin.top + scope.margin.bottom).append('g').attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')');
         scope.rack = scope.svg.append('g').attr('class', 'rack');
-        return scope.clientArea = scope.svg.append('g').attr('class', 'client-area').attr('transform', 'translate(10,70)');
+        return scope.clientArea = scope.svg.append('g').attr('class', 'client-area').attr('transform', 'translate(20,70)');
       }
     };
   });
@@ -79,20 +79,42 @@
       });
     };
     $scope.updateClients = function(clientData) {
-      var allClients, clients, enteringClients;
+      var allClientContainers, allClientShapes, clients, enteringClients;
       clients = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key);
       enteringClients = clients.enter().append('g').attr('class', 'client-container').attr('transform', function(d) {
         var x;
-        x = d.id * 60 + 10;
+        x = d.id * 100;
         return 'translate(' + x + ',10)';
       });
-      enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 10).attr('style', "stroke-width:3;stroke:rgb(0,0,0)");
-      return allClients = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key).attr('fill', function(d) {
+      enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40);
+      allClientShapes = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key).attr('fill', function(d) {
         if (d.status === 'idle') {
           return 'green';
         } else if (d.status === 'exercising') {
           return 'orange';
         }
+      });
+      return allClientContainers = $scope.clientArea.selectAll('.client-container').data(clientData, $scope.key).each(function(d) {
+        var clientDumbellData, dumbell, enteringClientWeightContainers, index, leavingClientContainers, record, _i, _len, _ref;
+        clientDumbellData = [];
+        _ref = d.dumbells;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          dumbell = _ref[index];
+          record = dumbell.dump();
+          record.index = index;
+          clientDumbellData.push(record);
+        }
+        enteringClientWeightContainers = d3.select(this).selectAll('.client-weights').data(clientDumbellData, $scope.key).enter().append('g').attr('class', 'client-weight-container').attr('transform', function(d) {
+          var x, y;
+          x = d.index === 0 ? -15 : 10 + 15;
+          y = 0;
+          return 'translate(' + x + ',' + y + ')';
+        });
+        enteringClientWeightContainers.append('circle').attr('class', 'dumbell').attr('r', 18);
+        enteringClientWeightContainers.append('text').attr('class', 'dumbell-text').attr('dx', -8).attr('dy', 5).attr('fill', 'white').text(function(d) {
+          return d.weight;
+        });
+        return leavingClientContainers = d3.select(this).selectAll('.client-weight-container').data(clientDumbellData, $scope.key).exit().remove();
       });
     };
     return $scope.$watch($scope.watchGym, $scope.updateGym, true);

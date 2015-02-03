@@ -22,4 +22,7 @@ angular.module('gymsym').factory 'Dumbell', () ->
     weight: () ->
       @props.weight
 
+    dump: () ->
+      { weight: @props.weight, id: @uniqId }
+      
   Dumbell

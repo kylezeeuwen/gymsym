@@ -26,7 +26,7 @@ app.directive 'gymView', ->
 
     scope.clientArea = scope.svg.append('g')
       .attr('class', 'client-area')
-      .attr('transform', 'translate(10,70)')
+      .attr('transform', 'translate(20,70)')
 
 
 app.controller 'GymViewController', ($scope, $interval, $timeout) ->
@@ -113,23 +113,61 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     enteringClients = clients.enter().append('g')
       .attr('class', 'client-container')
       .attr('transform', (d) ->
-        x = d.id * 60 + 10
+        x = d.id * 100
         return 'translate(' + x + ',10)'
       )
 
     enteringClients.append('rect')
       .attr('class', 'client-shape')
       .attr('width', 10)
-      .attr('height', 10)
-      .attr('style', "stroke-width:3;stroke:rgb(0,0,0)")
+      .attr('height', 40)
 
-    allClients = $scope.clientArea.selectAll('.client-shape')
+    allClientShapes = $scope.clientArea.selectAll('.client-shape')
       .data(clientData, $scope.key)
       .attr('fill', (d) ->
         if d.status is 'idle'
           'green'
         else if d.status is 'exercising'
           'orange'
+      )
+
+    allClientContainers = $scope.clientArea.selectAll('.client-container')
+      .data(clientData, $scope.key)
+      .each( (d) ->      
+
+        clientDumbellData = []
+        for dumbell, index in d.dumbells
+          record = dumbell.dump()
+          record.index = index
+          clientDumbellData.push record
+
+        enteringClientWeightContainers = d3.select(this).selectAll('.client-weights')
+          .data(clientDumbellData, $scope.key)
+          .enter()
+          .append('g')
+          .attr('class', 'client-weight-container')
+          .attr('transform', (d) ->
+            x = if d.index == 0 then -15 else 10 + 15
+            y = 0
+            return 'translate(' + x + ',' + y + ')'
+          )  
+ 
+        enteringClientWeightContainers.append('circle')
+          .attr('class', 'dumbell')
+          .attr('r', 18)
+
+        enteringClientWeightContainers.append('text')
+          .attr('class', 'dumbell-text')
+          .attr('dx', -8)
+          .attr('dy', 5)
+          .attr('fill', 'white')
+          .text( (d) ->
+            d.weight
+          )
+
+        leavingClientContainers = d3.select(this).selectAll('.client-weight-container')
+          .data(clientDumbellData, $scope.key)
+          .exit().remove()
       )
 
 
