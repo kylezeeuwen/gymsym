@@ -39,10 +39,10 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
 
   $scope.updateGym = (gymData) ->
     return unless 'rack' of gymData
-    $scope.updateRack gymData.rack
-    $scope.updateClients gymData.clients
+    $scope.updateRack gymData.rack, gymData.time
+    $scope.updateClients gymData.clients, gymData.time
 
-  $scope.updateRack = (rackData) ->
+  $scope.updateRack = (rackData, time) ->
 
     rackSpaces = $scope.rack.selectAll('.rack-space')
       .data(rackData, $scope.key)
@@ -105,7 +105,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         d.weight
       )
 
-  $scope.updateClients = (clientData) ->
+  $scope.updateClients = (clientData, time) ->
 
     clients = $scope.clientArea.selectAll('.client-shape')
       .data(clientData, $scope.key)
@@ -146,11 +146,6 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
           .enter()
           .append('g')
           .attr('class', 'client-weight-container')
-          .attr('transform', (d) ->
-            x = if d.index == 0 then -15 else 10 + 15
-            y = 0
-            return 'translate(' + x + ',' + y + ')'
-          )  
  
         enteringClientWeightContainers.append('circle')
           .attr('class', 'dumbell')
@@ -165,7 +160,14 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
             d.weight
           )
 
-        leavingClientContainers = d3.select(this).selectAll('.client-weight-container')
+        allClientWeightContainers = d3.select(this).selectAll('.client-weight-container')
+          .attr('transform', (d) ->
+            x = if d.index == 0 then -15 else 10 + 15
+            y = if (time % 2 == d.index) then -2 else 2
+            return 'translate(' + x + ',' + y + ')'
+          )  
+        
+        leavingClientWeightContainers = d3.select(this).selectAll('.client-weight-container')
           .data(clientDumbellData, $scope.key)
           .exit().remove()
       )

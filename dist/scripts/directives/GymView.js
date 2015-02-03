@@ -39,10 +39,10 @@
       if (!('rack' in gymData)) {
         return;
       }
-      $scope.updateRack(gymData.rack);
-      return $scope.updateClients(gymData.clients);
+      $scope.updateRack(gymData.rack, gymData.time);
+      return $scope.updateClients(gymData.clients, gymData.time);
     };
-    $scope.updateRack = function(rackData) {
+    $scope.updateRack = function(rackData, time) {
       var AllDumbellText, allDumbellSlots, allRackSpaces, enteringRackSpaces, rackSpaces;
       rackSpaces = $scope.rack.selectAll('.rack-space').data(rackData, $scope.key);
       enteringRackSpaces = rackSpaces.enter().append('g').attr('class', 'rack-space-container').attr('transform', function(d) {
@@ -78,7 +78,7 @@
         return d.weight;
       });
     };
-    $scope.updateClients = function(clientData) {
+    $scope.updateClients = function(clientData, time) {
       var allClientContainers, allClientShapes, clients, enteringClients;
       clients = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key);
       enteringClients = clients.enter().append('g').attr('class', 'client-container').attr('transform', function(d) {
@@ -95,7 +95,7 @@
         }
       });
       return allClientContainers = $scope.clientArea.selectAll('.client-container').data(clientData, $scope.key).each(function(d) {
-        var clientDumbellData, dumbell, enteringClientWeightContainers, index, leavingClientContainers, record, _i, _len, _ref;
+        var allClientWeightContainers, clientDumbellData, dumbell, enteringClientWeightContainers, index, leavingClientWeightContainers, record, _i, _len, _ref;
         clientDumbellData = [];
         _ref = d.dumbells;
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -104,17 +104,18 @@
           record.index = index;
           clientDumbellData.push(record);
         }
-        enteringClientWeightContainers = d3.select(this).selectAll('.client-weights').data(clientDumbellData, $scope.key).enter().append('g').attr('class', 'client-weight-container').attr('transform', function(d) {
-          var x, y;
-          x = d.index === 0 ? -15 : 10 + 15;
-          y = 0;
-          return 'translate(' + x + ',' + y + ')';
-        });
+        enteringClientWeightContainers = d3.select(this).selectAll('.client-weights').data(clientDumbellData, $scope.key).enter().append('g').attr('class', 'client-weight-container');
         enteringClientWeightContainers.append('circle').attr('class', 'dumbell').attr('r', 18);
         enteringClientWeightContainers.append('text').attr('class', 'dumbell-text').attr('dx', -8).attr('dy', 5).attr('fill', 'white').text(function(d) {
           return d.weight;
         });
-        return leavingClientContainers = d3.select(this).selectAll('.client-weight-container').data(clientDumbellData, $scope.key).exit().remove();
+        allClientWeightContainers = d3.select(this).selectAll('.client-weight-container').attr('transform', function(d) {
+          var x, y;
+          x = d.index === 0 ? -15 : 10 + 15;
+          y = time % 2 === d.index ? -2 : 2;
+          return 'translate(' + x + ',' + y + ')';
+        });
+        return leavingClientWeightContainers = d3.select(this).selectAll('.client-weight-container').data(clientDumbellData, $scope.key).exit().remove();
       });
     };
     return $scope.$watch($scope.watchGym, $scope.updateGym, true);

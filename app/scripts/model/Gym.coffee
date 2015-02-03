@@ -46,10 +46,9 @@ angular.module('gymsym').factory 'Gym', () ->
     dump: () ->
       data =
         clients: []
-
-      #XXX Add clients to dump
-
-      data.rack = @rack.dump()
+        rack: @rack.dump()
+        time: @time
+        
       for client in @clients
         data.clients.push client.dump()
 

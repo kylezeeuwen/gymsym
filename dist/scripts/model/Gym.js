@@ -59,9 +59,10 @@
       Gym.prototype.dump = function() {
         var client, data, _i, _len, _ref;
         data = {
-          clients: []
+          clients: [],
+          rack: this.rack.dump(),
+          time: this.time
         };
-        data.rack = this.rack.dump();
         _ref = this.clients;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           client = _ref[_i];
