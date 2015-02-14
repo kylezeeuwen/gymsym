@@ -61,13 +61,13 @@ describe 'RackSpec:', ->
       expect(@makeCallPutDumbellFunction 1, 'poop').toThrow new Error 'invalid dumbell call putDumbell(index,dumbell)'
 
     it 'throws error if slot is non numeric', ->
-      expect(@makeCallPutDumbellFunction 'dogs', @dumbell).toThrow new Error 'invalid slotIndex'
+      expect(@makeCallPutDumbellFunction 'dogs', @dumbell).toThrow new Error "invalid slotIndex 'NaN'"
 
     it 'throws error if slot is negative', ->
-      expect(@makeCallPutDumbellFunction -1, @dumbell).toThrow new Error 'slotIndex out of range'
+      expect(@makeCallPutDumbellFunction -1, @dumbell).toThrow new Error "slotIndex '-1' out of range"
 
     it 'throws error if slot is greater than numSlots', ->    
-      expect(@makeCallPutDumbellFunction 2, @dumbell).toThrow new Error 'slotIndex out of range'
+      expect(@makeCallPutDumbellFunction 2, @dumbell).toThrow new Error "slotIndex '2' out of range"
 
   describe 'takeDumbell:', ->
 
@@ -98,13 +98,13 @@ describe 'RackSpec:', ->
       expect(@makeCallTakeDumbellFunction 0).toThrow new Error 'space empty'
       
     it 'throws error if slot is non numeric', ->
-      expect(@makeCallTakeDumbellFunction 'dogs').toThrow new Error 'invalid slotIndex'
+      expect(@makeCallTakeDumbellFunction 'dogs').toThrow new Error "invalid slotIndex 'NaN'"
 
     it 'throws error if slot is negative', ->
-      expect(@makeCallTakeDumbellFunction -1).toThrow new Error 'slotIndex out of range'
+      expect(@makeCallTakeDumbellFunction -1).toThrow new Error "slotIndex '-1' out of range"
 
     it 'throws error if slot is greater than numSlots', ->    
-      expect(@makeCallTakeDumbellFunction 2).toThrow new Error 'slotIndex out of range'
+      expect(@makeCallTakeDumbellFunction 2).toThrow new Error "slotIndex '2' out of range"
  
   describe 'hasWeight:', ->
  

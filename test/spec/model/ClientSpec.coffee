@@ -11,12 +11,12 @@ describe 'ClientSpec:', ->
       exercise1 =
         name: 'exercise1'
         duration: 5
-        weights: [10, 10]
+        dumbells: [10, 10]
 
       exercise2 =
         name: 'exercise2'
         duration: 5
-        weights: [5]
+        dumbells: [5]
 
       @client = @Client.create 'client1', [ exercise1, exercise2 ]
 
@@ -30,8 +30,8 @@ describe 'ClientSpec:', ->
     it 'increments the id', ->
       @client2 = @Client.create 'name', []
 
-      expect(@client.id()).toBe 1
-      expect(@client2.id()).toBe 2
+      expect(@client.id()).toBe 0
+      expect(@client2.id()).toBe 1
 
     describe 'validateWorkoutPlan: ', ->
       #XXX: TODO test validation
