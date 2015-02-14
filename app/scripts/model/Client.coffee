@@ -36,7 +36,7 @@ angular.module('gymsym').factory 'Client', () ->
         requiredWeights = nextExercise.dumbells
         #TODO extend for multiple dumbells
         if @rack.hasWeights requiredWeights
-          dumbells = @rack.takeDumbellsWithWeights requiredWeights
+          dumbells = @rack.takeDumbells requiredWeights
           @startExercise nextExercise, dumbells
 
       else

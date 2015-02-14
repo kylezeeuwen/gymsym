@@ -77,7 +77,7 @@
         return this.spaces[slotIndex]['dumbell'] = dumbell;
       };
 
-      Rack.prototype.takeDumbell = function(slotIndexArg) {
+      Rack.prototype.takeFromSlot = function(slotIndexArg) {
         var dumbell, slotIndex;
         slotIndex = parseInt(slotIndexArg);
         this.validateSlotIndex(slotIndex);
@@ -87,14 +87,6 @@
         dumbell = this.spaces[slotIndex]['dumbell'];
         this.spaces[slotIndex]['dumbell'] = null;
         return dumbell;
-      };
-
-      Rack.prototype.hasWeight = function(weight) {
-        if (this.getSlotIndexesForWeight(weight).length > 0) {
-          return true;
-        } else {
-          return false;
-        }
       };
 
       Rack.prototype.hasWeights = function(requiredWeights) {
@@ -119,7 +111,7 @@
         return hasAll;
       };
 
-      Rack.prototype.takeDumbellsWithWeights = function(requiredWeights) {
+      Rack.prototype.takeDumbells = function(requiredWeights) {
         var dumbells, weight, _i, _len;
         dumbells = [];
         for (_i = 0, _len = requiredWeights.length; _i < _len; _i++) {
@@ -135,7 +127,7 @@
         if (!(indexes.length > 0)) {
           throw new Error("cannot takeFirstDumbellWithWeight(" + weight + "): no dumbell available");
         }
-        return this.takeDumbell(indexes[0]);
+        return this.takeFromSlot(indexes[0]);
       };
 
       Rack.prototype.getSlotIndexesForWeight = function(weight) {

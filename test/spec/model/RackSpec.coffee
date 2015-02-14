@@ -69,57 +69,90 @@ describe 'RackSpec:', ->
     it 'throws error if slot is greater than numSlots', ->    
       expect(@makeCallPutDumbellFunction 2, @dumbell).toThrow new Error "slotIndex '2' out of range"
 
-  describe 'takeDumbell:', ->
+  describe 'takeFromSlot:', ->
 
     beforeEach ->
       @rack = @Rack.create 1, 2
       @dumbell = @Dumbell.create 1
-      @makeCallTakeDumbellFunction = (index) ->
+      @makeCallTakeFromSlotFunction = (index) ->
         theRack = @Rack.create 1, 2
         return ->
-          theRack.takeDumbell index
+          theRack.takeFromSlot index
 
     it 'it gets the dumbell', ->
       @rack.putDumbell 0, @dumbell
-      dumbell = @rack.takeDumbell 0
+      dumbell = @rack.takeFromSlot 0
       expect(dumbell).toBe @dumbell
 
     it 'removes the dumbell from the rack', ->
       @rack.putDumbell 0, @dumbell
-      dumbell = @rack.takeDumbell 0
+      dumbell = @rack.takeFromSlot 0
       expect(@rack.spaces[0]).toEqual { label: 1, dumbell: null }
 
     it 'leaves the spaces array the same length', ->
       @rack.putDumbell 0, @dumbell
-      dumbell = @rack.takeDumbell 0
+      dumbell = @rack.takeFromSlot 0
       expect(@rack.spaces.length).toBe 2
 
     it 'throws error if slot is empty', ->
-      expect(@makeCallTakeDumbellFunction 0).toThrow new Error 'space empty'
+      expect(@makeCallTakeFromSlotFunction 0).toThrow new Error 'space empty'
       
     it 'throws error if slot is non numeric', ->
-      expect(@makeCallTakeDumbellFunction 'dogs').toThrow new Error "invalid slotIndex 'NaN'"
+      expect(@makeCallTakeFromSlotFunction 'dogs').toThrow new Error "invalid slotIndex 'NaN'"
 
     it 'throws error if slot is negative', ->
-      expect(@makeCallTakeDumbellFunction -1).toThrow new Error "slotIndex '-1' out of range"
+      expect(@makeCallTakeFromSlotFunction -1).toThrow new Error "slotIndex '-1' out of range"
 
     it 'throws error if slot is greater than numSlots', ->    
-      expect(@makeCallTakeDumbellFunction 2).toThrow new Error "slotIndex '2' out of range"
+      expect(@makeCallTakeFromSlotFunction 2).toThrow new Error "slotIndex '2' out of range"
  
-  describe 'hasWeight:', ->
- 
-     beforeEach ->
-       @rack = @Rack.create 1, 2, 3, 4
-       @rack.putDumbell 0, @Dumbell.create 10
-       @rack.putDumbell 1, @Dumbell.create 10
-       @rack.putDumbell 2, @Dumbell.create 5
+  describe 'takeDumbells:', ->
 
-     it 'returns true if the weight is present', ->  
-       expect(@rack.hasWeight 10).toBe true
-       
-     it 'returns false if the weight is present', ->
-       expect(@rack.hasWeight 1).toBe false
- 
+    beforeEach ->
+      @rack = @Rack.create 0, 1, 2
+
+    it 'gets multiple dumbells if they are present', ->
+      dumbell0 =  @Dumbell.create 10    
+      dumbell1 =  @Dumbell.create 10    
+      @rack.putDumbell 0, dumbell0
+      @rack.putDumbell 1, dumbell1
+      dumbells = @rack.takeDumbells [10,10]
+      expect(dumbells).toEqual [dumbell0,dumbell1]
+      expect(@rack.getEmptySlotsForDumbell()).toEqual [0,1,2]
+
+    it 'throws error if dumbells are not present', ->
+      @throwsFunction = (index) ->
+        theRack = @rack
+        return ->
+          theRack.takeDumbells [10,10]
+      
+      expect(@throwsFunction()).toThrow new Error "cannot takeFirstDumbellWithWeight(10): no dumbell available"
+
+  describe 'hasWeights:', ->
+    beforeEach ->
+      @rack = @Rack.create 1, 2, 3, 4
+      @rack.putDumbell 0, @Dumbell.create 10
+      @rack.putDumbell 1, @Dumbell.create 10
+      @rack.putDumbell 2, @Dumbell.create 5
+
+    it 'returns true if empty array passed', ->  
+      expect(@rack.hasWeights []).toBe true
+
+    it 'returns true if single weight is present', ->  
+      expect(@rack.hasWeights [10]).toBe true
+      
+    it 'returns false if the weight is not present', ->
+      expect(@rack.hasWeights [1]).toBe false
+
+    it 'returns true if multiple weights are present', ->  
+      expect(@rack.hasWeights [10, 10]).toBe true
+      
+    it 'returns false if the some are present and some are not', ->
+      expect(@rack.hasWeights [10, 4]).toBe false
+
+  #XXX TODO test getEmptySlotsForDumbell
+  #XXX TODO test getEmptySlots
+
   describe 'getSlotIndexesForWeight:', ->
     
     beforeEach ->

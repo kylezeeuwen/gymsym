@@ -44,7 +44,7 @@
         if (nextExercise) {
           requiredWeights = nextExercise.dumbells;
           if (this.rack.hasWeights(requiredWeights)) {
-            dumbells = this.rack.takeDumbellsWithWeights(requiredWeights);
+            dumbells = this.rack.takeDumbells(requiredWeights);
             return this.startExercise(nextExercise, dumbells);
           }
         } else {

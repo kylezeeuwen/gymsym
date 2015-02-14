@@ -54,7 +54,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       
       @spaces[slotIndex]['dumbell'] = dumbell
 
-    takeDumbell: (slotIndexArg) ->
+    takeFromSlot: (slotIndexArg) ->
       slotIndex = parseInt(slotIndexArg)
 
       @validateSlotIndex slotIndex
@@ -67,12 +67,6 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       @spaces[slotIndex]['dumbell'] = null
 
       return dumbell
-
-    hasWeight: (weight) ->
-      if @getSlotIndexesForWeight(weight).length > 0
-        true
-      else
-        false
 
     hasWeights: (requiredWeights) ->
       availableWeights = []
@@ -90,7 +84,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
 
       hasAll    
 
-    takeDumbellsWithWeights: (requiredWeights) ->
+    takeDumbells: (requiredWeights) ->
       dumbells = []
       for weight in requiredWeights
         dumbells.push @takeFirstDumbellWithWeight weight
@@ -102,7 +96,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       indexes = @getSlotIndexesForWeight weight
       unless indexes.length > 0
         throw new Error "cannot takeFirstDumbellWithWeight(#{weight}): no dumbell available"
-      @takeDumbell indexes[0]
+      @takeFromSlot indexes[0]
 
     # TODO change weight to dumbell in name of function
     getSlotIndexesForWeight: (weight) ->
