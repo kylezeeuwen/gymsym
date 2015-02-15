@@ -107,10 +107,14 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       indexes
 
     getEmptySlotsForDumbell: (dumbell) ->
+
+      if dumbell and not(dumbell instanceof Dumbell)
+        throw new 'invalid dumbell: not a Dumbell'
+
       slots = []
       for space,index in @spaces
         if not space['dumbell']
-          if (not dumbell) or dumbell.weight == space.label
+          if (not dumbell) or dumbell.weight() == space.label
             slots.push index
       slots
 

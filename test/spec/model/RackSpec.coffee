@@ -69,6 +69,34 @@ describe 'RackSpec:', ->
     it 'throws error if slot is greater than numSlots', ->    
       expect(@makeCallPutDumbellFunction 2, @dumbell).toThrow new Error "slotIndex '2' out of range"
 
+  #XXX TODO test getEmptySlotsForDumbell
+  #XXX TODO test getEmptySlots
+  describe 'getEmptySlots*:', ->
+
+    beforeEach ->
+      @rack = @Rack.create 3, 6
+      @rack.putDumbell 0, @Dumbell.create 10
+
+    it 'getEmptySlots reports the empty slots', ->
+      expect(@rack.getEmptySlots()).toEqual [1]
+
+    it 'getEmptySlotsForDumbell reports no empty slots if slot taken', ->
+      expect(@rack.getEmptySlotsForDumbell(@Dumbell.create 3)).toEqual []
+
+    it 'getEmptySlotsForDumbell reports 1 empty slot for matching weight', ->
+      console.log 'stuff'
+      expect(@rack.getEmptySlotsForDumbell(@Dumbell.create 6)).toEqual [1]
+
+    it 'getEmptySlotsForDumbell reports no empty slots for weight != label', ->
+      expect(@rack.getEmptySlotsForDumbell(@Dumbell.create 10)).toEqual []
+
+    it 'throws error unless a Dumbell is passed in', ->
+      @makeExceptionFunction = (input) ->
+        theRack = @rack
+        return ->
+          theRack.getEmptySlotsForDumbell input
+        expect(@makeExceptionFunction 3).toThrow new Err 'invalid dumbell: not a Dumbell'
+
   describe 'takeFromSlot:', ->
 
     beforeEach ->
@@ -150,8 +178,6 @@ describe 'RackSpec:', ->
     it 'returns false if the some are present and some are not', ->
       expect(@rack.hasWeights [10, 4]).toBe false
 
-  #XXX TODO test getEmptySlotsForDumbell
-  #XXX TODO test getEmptySlots
 
   describe 'getSlotIndexesForWeight:', ->
     
