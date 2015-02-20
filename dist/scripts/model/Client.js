@@ -147,9 +147,14 @@
         return this.uniqId;
       };
 
+      Client.prototype.type = function() {
+        return 'AverageClient';
+      };
+
       Client.prototype.dump = function() {
         return {
           id: this.id(),
+          type: this.type(),
           name: this.name,
           status: this.status,
           dumbells: this.dumbells

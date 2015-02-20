@@ -112,9 +112,13 @@ angular.module('gymsym').factory 'Client', () ->
     id: () ->
       @uniqId
 
+    type: () ->
+      'AverageClient'
+
     dump: () ->
       return {
         id: @id()
+        type: @type()
         name: @name
         status: @status
         dumbells: @dumbells

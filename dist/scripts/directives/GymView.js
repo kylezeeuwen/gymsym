@@ -19,7 +19,7 @@
           bottom: 19.5,
           left: 19.5
         };
-        scope.width = 500 - scope.margin.right;
+        scope.width = 1000 - scope.margin.right;
         scope.height = 150 - scope.margin.top - scope.margin.bottom;
         scope.svg = d3.select('#' + iElement.attr('id')).append('svg').attr('width', scope.width + scope.margin.left + scope.margin.right).attr('height', scope.height + scope.margin.top + scope.margin.bottom).append('g').attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')');
         scope.rack = scope.svg.append('g').attr('class', 'rack');
@@ -88,10 +88,11 @@
       });
       enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40);
       allClientShapes = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key).attr('fill', function(d) {
-        if (d.status === 'idle') {
+        console.log(d);
+        if (d.type === 'RandomClient') {
+          return 'red';
+        } else {
           return 'green';
-        } else if (d.status === 'exercising') {
-          return 'orange';
         }
       });
       return allClientContainers = $scope.clientArea.selectAll('.client-container').data(clientData, $scope.key).each(function(d) {

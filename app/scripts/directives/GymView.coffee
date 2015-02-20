@@ -11,7 +11,7 @@ app.directive 'gymView', ->
 
     # dimensions
     scope.margin = {top: 19.5, right: 19.5, bottom: 19.5, left: 19.5}
-    scope.width = 500 - scope.margin.right
+    scope.width = 1000 - scope.margin.right
     scope.height = 150 - scope.margin.top - scope.margin.bottom
 
     #Create the SVG container and set the origin.
@@ -125,10 +125,10 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     allClientShapes = $scope.clientArea.selectAll('.client-shape')
       .data(clientData, $scope.key)
       .attr('fill', (d) ->
-        if d.status is 'idle'
+        if d.type is 'RandomClient'
+          'red'
+        else
           'green'
-        else if d.status is 'exercising'
-          'orange'
       )
 
     allClientContainers = $scope.clientArea.selectAll('.client-container')
