@@ -88,7 +88,6 @@
       });
       enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40);
       allClientShapes = $scope.clientArea.selectAll('.client-shape').data(clientData, $scope.key).attr('fill', function(d) {
-        console.log(d);
         if (d.type === 'RandomClient') {
           return 'red';
         } else {

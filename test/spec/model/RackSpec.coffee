@@ -84,7 +84,6 @@ describe 'RackSpec:', ->
       expect(@rack.getEmptySlotsForDumbell(@Dumbell.create 3)).toEqual []
 
     it 'getEmptySlotsForDumbell reports 1 empty slot for matching weight', ->
-      console.log 'stuff'
       expect(@rack.getEmptySlotsForDumbell(@Dumbell.create 6)).toEqual [1]
 
     it 'getEmptySlotsForDumbell reports no empty slots for weight != label', ->

@@ -45,16 +45,18 @@
           requiredWeights = nextExercise.dumbells;
           if (this.rack.hasWeights(requiredWeights)) {
             dumbells = this.rack.takeDumbells(requiredWeights);
-            return this.startExercise(nextExercise, dumbells);
+            this.startExercise(nextExercise, dumbells);
+            return this.status = 'exercising';
           }
         } else {
-          return this.finishWorkout();
+          return this.status = 'finished';
         }
       };
 
       Client.prototype.transitionsFromExercising = function(client) {
         if (this.currentExercise.startTime + this.currentExercise.duration < this.time) {
-          return this.finishExercise();
+          this.finishExercise();
+          return this.status = 'idle';
         }
       };
 
@@ -68,23 +70,17 @@
         return this.rack = rack;
       };
 
-      Client.prototype.finishWorkout = function() {
-        return this.status = 'finished';
-      };
-
       Client.prototype.startExercise = function(exercise, dumbells) {
         this.currentExercise = this.workoutPlan[exercise.id];
         this.currentExercise.status = 'active';
         this.currentExercise.startTime = this.time;
-        this.status = 'exercising';
         return this.dumbells = this.dumbells.concat(dumbells);
       };
 
       Client.prototype.finishExercise = function() {
         this.currentExercise.status = 'complete';
         this.currentExercise.endTime = this.time;
-        this.returnDumbells();
-        return this.status = 'idle';
+        return this.returnDumbells();
       };
 
       Client.prototype.returnDumbells = function() {
@@ -98,7 +94,7 @@
           } else if (availableSlots.length > 0) {
             _results.push(this.rack.putDumbell(availableSlots[0], dumbell));
           } else {
-            throw new Error("Cannot return dumbell " + dumbell + ": rack is full");
+            throw new Error("Cannot return dumbell " + (dumbell.weight()) + ": rack is full");
           }
         }
         return _results;
@@ -119,8 +115,8 @@
             throw new Error("" + place + " missing duration");
           }
           ex.duration = parseInt(ex.duration);
-          if (!_.isNumber(ex.duration)) {
-            throw new Error("" + place + " invalid duraiton '" + ex.duration + "'");
+          if (isNaN(ex.duration)) {
+            throw new Error("" + place + " non-numeric duration");
           }
           if (!('dumbells' in ex)) {
             throw new Error("" + place + " missing dumbells");
@@ -133,8 +129,8 @@
             weight = _ref[wIndex];
             place = "workoutPlan[" + index + "].dumbells[" + wIndex + "]";
             ex.dumbells[wIndex] = parseInt(weight);
-            if (!_.isNumber(ex.dumbells[wIndex])) {
-              throw new Error("" + place + " invalid weight '" + ex.dumbells[wIndex] + "'");
+            if (isNaN(ex.dumbells[wIndex])) {
+              throw new Error("" + place + " non-numeric weight");
             }
           }
           ex.status = 'pending';

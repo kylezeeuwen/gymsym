@@ -29,7 +29,6 @@ angular.module('gymsym').factory 'Client', () ->
 
       @status
 
-    #TODO nest this via transitionsFromIdle ?
     transitionsFromIdle: () ->
       nextExercise = @getNextExercise()
       if nextExercise
@@ -38,14 +37,15 @@ angular.module('gymsym').factory 'Client', () ->
         if @rack.hasWeights requiredWeights
           dumbells = @rack.takeDumbells requiredWeights
           @startExercise nextExercise, dumbells
+          @status = 'exercising'
 
       else
-        @finishWorkout()
+        @status = 'finished'
 
     transitionsFromExercising: (client) ->
       if @currentExercise.startTime + @currentExercise.duration < @time
-        #TODO This is where client needs access to rack via gym
         @finishExercise()
+        @status = 'idle'
 
     getNextExercise: () ->
       _.findWhere @workoutPlan, status: 'pending'
@@ -54,16 +54,10 @@ angular.module('gymsym').factory 'Client', () ->
       #TODO is there shorthand for this assignment stuff
       @rack = rack
 
-    finishWorkout: () ->
-      @status = 'finished'
-
     startExercise: (exercise, dumbells) ->
       @currentExercise = @workoutPlan[exercise.id]
       @currentExercise.status = 'active'
       @currentExercise.startTime = @time
-
-      @status = 'exercising'
-
       @dumbells = @dumbells.concat dumbells
 
     finishExercise: () ->
@@ -71,8 +65,6 @@ angular.module('gymsym').factory 'Client', () ->
       @currentExercise.endTime = @time
 
       @returnDumbells()
-
-      @status = 'idle'
 
     returnDumbells: () ->
       while dumbell = @dumbells.shift()
@@ -83,7 +75,7 @@ angular.module('gymsym').factory 'Client', () ->
         else if availableSlots.length > 0
           @rack.putDumbell availableSlots[0], dumbell
         else
-          throw new Error "Cannot return dumbell #{dumbell}: rack is full"
+          throw new Error "Cannot return dumbell #{dumbell.weight()}: rack is full"
 
     validateWorkoutPlan: (workoutPlan) ->
       throw new Error 'workoutPlan must be array' unless workoutPlan instanceof Array
@@ -94,14 +86,14 @@ angular.module('gymsym').factory 'Client', () ->
 
         throw new Error "#{place} missing duration" unless 'duration' of ex
         ex.duration = parseInt ex.duration
-        throw new Error "#{place} invalid duraiton '#{ex.duration}'" unless _.isNumber ex.duration
+        throw new Error "#{place} non-numeric duration" if isNaN ex.duration
 
         throw new Error "#{place} missing dumbells" unless 'dumbells' of ex
         throw new Error "#{place} dumbells must be array" unless ex.dumbells instanceof Array
         for weight, wIndex in ex.dumbells
           place = "workoutPlan[#{index}].dumbells[#{wIndex}]"
           ex.dumbells[wIndex] = parseInt weight
-          throw new Error "#{place} invalid weight '#{ex.dumbells[wIndex]}'" unless _.isNumber ex.dumbells[wIndex]
+          throw new Error "#{place} non-numeric weight" if isNaN ex.dumbells[wIndex]
         
         #pending, active, complete
         ex.status = 'pending'
