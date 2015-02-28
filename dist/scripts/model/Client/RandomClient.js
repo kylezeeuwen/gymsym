@@ -2,7 +2,7 @@
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  angular.module('gymsym').factory('RandomClient', function(Client) {
+  angular.module('gymsym').factory('RandomClient', function(BaseClient) {
     var RandomClient;
     RandomClient = (function(_super) {
       __extends(RandomClient, _super);
@@ -11,8 +11,8 @@
         return RandomClient.__super__.constructor.apply(this, arguments);
       }
 
-      RandomClient.create = function(name, program) {
-        return new RandomClient(name, program);
+      RandomClient.create = function(id, name, program) {
+        return new RandomClient(id, name, program);
       };
 
       RandomClient.prototype.returnDumbells = function() {
@@ -30,13 +30,11 @@
         return _results;
       };
 
-      RandomClient.prototype.type = function() {
-        return 'RandomClient';
-      };
+      RandomClient.prototype.clientType = 'RandomClient';
 
       return RandomClient;
 
-    })(Client);
+    })(BaseClient);
     return RandomClient;
   });
 

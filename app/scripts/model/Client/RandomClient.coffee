@@ -1,10 +1,10 @@
-angular.module('gymsym').factory 'RandomClient', (Client) ->
+angular.module('gymsym').factory 'RandomClient', (BaseClient) ->
 
-  class RandomClient extends Client
+  class RandomClient extends BaseClient
 
-    @create: (name, program) ->
-      new RandomClient(name, program)
-
+    @create: (id,name,program) ->
+      new RandomClient id, name, program
+      
     returnDumbells: () ->
       while dumbell = @dumbells.shift()
         availableSlots = @rack.getEmptySlots()
@@ -14,8 +14,6 @@ angular.module('gymsym').factory 'RandomClient', (Client) ->
         else
           throw new Error "Cannot return dumbell #{dumbell}: rack is full"
     
-    #@TODO I dont need to extend this just override constructor or some @type field in base class
-    type: () ->
-      'RandomClient'
+    clientType: 'RandomClient'
 
   RandomClient

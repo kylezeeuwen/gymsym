@@ -1,4 +1,4 @@
-describe 'ClientSpec:', ->
+describe 'BaseClientSpec (via AverageJoe child class):', ->
 
   beforeEach -> 
     window.angular.mock.module 'gymsym'
@@ -20,7 +20,7 @@ describe 'ClientSpec:', ->
         duration: 5
         dumbells: [5]
 
-      @client = @Client.create 'client1', [ exercise1, exercise2 ]
+      @client = @Client.create 'client1', 'AverageJoe', [ exercise1, exercise2 ]
 
     it 'name is saved', ->
       expect(@client.name).toBe 'client1'
@@ -37,7 +37,7 @@ describe 'ClientSpec:', ->
       expect(@client.workoutPlan[1].name).toBe 'exercise2'
 
     it 'increments the id', ->
-      @client2 = @Client.create 'name', []
+      @client2 = @Client.create 'name', 'AverageJoe', []
 
       expect(@client.id()).toBe 0
       expect(@client2.id()).toBe 1
@@ -47,7 +47,7 @@ describe 'ClientSpec:', ->
     beforeEach ->
       @makeThrowsFn = (plan) ->
         return =>
-          @Client.create 'c1', plan
+          @Client.create 'c1', 'AverageJoe', plan
 
     it 'accepts a valid plan', ->
       plan = [{ name: 'ex1', duration: 4, dumbells: [1] }]
@@ -81,7 +81,7 @@ describe 'ClientSpec:', ->
         @rack = @Rack.create 1
         @rack.putDumbell 0, @Dumbell.create 1
         @workoutPlan = [{ name: 'c1-ex1', duration: 1, dumbells: [1] }]
-        @client = new @Client('c1', @workoutPlan)
+        @client = @Client.create 'c1', 'AverageJoe', @workoutPlan
         @client.startWorkout @rack
 
       it 'finishes workout it there are no more exercises', ->
@@ -107,7 +107,7 @@ describe 'ClientSpec:', ->
         @rack = @Rack.create 1
         @rack.putDumbell 0, @Dumbell.create 1
         @workoutPlan = [{ name: 'c1-ex1', duration: 2, dumbells: [1] }]
-        @client = new @Client('c1', @workoutPlan)
+        @client = @Client.create 'c1', 'AverageJoe', @workoutPlan
         @client.startWorkout @rack
         @client.advanceTime 1
 
@@ -118,45 +118,3 @@ describe 'ClientSpec:', ->
       it 'the user finishes exercise when duration is over', ->
         @client.advanceTime 4
         expect(@client.status).toBe 'idle'
-
-  describe 'returnDumbells:', ->
-
-    beforeEach ->
-      @rack = @Rack.create 2, 2, 1
-      @client = @Client.create 'c1', []
-      @client.startWorkout @rack
-
-      @d1 = @Dumbell.create 1
-      @d2 = @Dumbell.create 2
-
-    it 'client will put the dumbells in the right spot if possible', ->
-      @client.dumbells.push @d1
-      @client.returnDumbells()
-
-      expect(@rack.spaces).toEqual [
-        { label: 2, dumbell: null }
-        { label: 2, dumbell: null }
-        { label: 1, dumbell: @d1 }
-      ]
-
-    it 'client will put the dumbells in first available spot if the right spot is not available', ->
-      @client.dumbells.push @d1
-      @rack.spaces[2].dumbell = @d2
-      @client.returnDumbells()
-
-      expect(@rack.spaces).toEqual [
-        { label: 2, dumbell: @d1 }
-        { label: 2, dumbell: null }
-        { label: 1, dumbell: @d2 }
-      ]
-
-    it 'client will throw error if there is no space for weight', ->
-      @client.dumbells.push @d1
-      @rack.spaces[0].dumbell = @d2
-      @rack.spaces[1].dumbell = @Dumbell.create 1
-      @rack.spaces[2].dumbell = @Dumbell.create 1
-
-      throwsFn = () =>
-        @client.returnDumbells()
-
-      expect(throwsFn).toThrow new Error 'Cannot return dumbell 1: rack is full'

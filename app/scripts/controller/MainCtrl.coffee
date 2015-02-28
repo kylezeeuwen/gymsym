@@ -36,7 +36,7 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
   , 35 * $scope.intervalLength
 
   $timeout ->
-    client1 = RandomClient.create 'client1', [
+    client1 = Client.create 'client1', 'Random', [
       { name: 'c1-ex1', duration: 3, dumbells: [10,10] }
       { name: 'c1-ex2', duration: 5, dumbells: [5,5] }
       { name: 'c1-ex3', duration: 4, dumbells: [20,20] }
@@ -45,7 +45,7 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
   , 2.5 * $scope.intervalLength
 
   $timeout ->
-    client2 = Client.create 'client2', [
+    client2 = Client.create 'client2', 'AverageJoe', [
       { name: 'c2-ex1', duration: 2, dumbells: [10] }
       { name: 'c2-ex2', duration: 4, dumbells: [25, 25] }
       { name: 'c2-ex3', duration: 2, dumbells: [15] }
@@ -54,7 +54,7 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
   , 3.5 * $scope.intervalLength
 
   $timeout ->
-    client3 = Client.create 'client3', [
+    client3 = Client.create 'client3', 'AverageJoe', [
       { name: 'c3-ex1', duration: 1, dumbells: [30] }
       { name: 'c3-ex2', duration: 5, dumbells: [12, 12] }
     ]
@@ -62,7 +62,7 @@ angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Cli
   , 1.5 * $scope.intervalLength
 
   $timeout ->
-    client4 = Client.create 'client4', [
+    client4 = Client.create 'client4', 'AverageJoe', [
       { name: 'c4-ex1', duration: 1, dumbells: [5] }
       { name: 'c4-ex2', duration: 5, dumbells: [25, 25] }
       { name: 'c4-ex3', duration: 2, dumbells: [15, 15] }

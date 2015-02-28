@@ -3,6 +3,18 @@
 // generated on 2015-01-10 using generator-gulp-webapp 0.2.0
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
+var fs = require('fs-extra');
+var runSequence = require('run-sequence');
+
+gulp.task('clean', function(cb) {
+  fs.remove('dist', cb);
+});
+
+gulp.task('test-clean', function(cb) {
+  fs.remove('compiled', cb);
+});
+
+//gulp.task('clean', require('del').bind(null, ['dist']));
 
 gulp.task('compile-coffee', function () {
   var gulp_coffee = require("gulp-coffee");
@@ -15,7 +27,11 @@ gulp.task('compile-coffee', function () {
     .pipe(gulp.dest('dist/scripts/'));
 });
 
-gulp.task('test', ['compile-coffee', 'wiredep', 'copy'], function () {
+gulp.task('test', function(cb) {
+  runSequence(['test-clean', 'clean'], ['compile-coffee', 'wiredep', 'copy'], 'karma', cb);
+});
+
+gulp.task('karma', function() {
   var karma = require('gulp-karma');
   var testFiles = 'compiled/test/**/*Spec.js';
 
@@ -71,8 +87,6 @@ gulp.task('copy', function () {
 
 });
 
-gulp.task('clean', require('del').bind(null, ['dist']));
-
 gulp.task('connect', ['build'], function () {
   var serveStatic = require('serve-static');
   var serveIndex = require('serve-index');
@@ -125,7 +139,7 @@ gulp.task('watch', ['connect'], function () {
 
 //clean doesn't finish before next task ..
 //gulp.task('build', ['clean', 'wiredep', 'images', 'fonts', 'styles', 'copy'], function () {
-gulp.task('build', ['wiredep', 'compile-coffee', 'images', 'fonts', 'styles', 'copy'], function () {
+gulp.task('build', ['wiredep', 'compile-coffee', 'fonts', 'styles', 'copy'], function () {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
 });
 

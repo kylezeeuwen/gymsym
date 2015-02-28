@@ -27,7 +27,7 @@
     }, 35 * $scope.intervalLength);
     $timeout(function() {
       var client1;
-      client1 = RandomClient.create('client1', [
+      client1 = Client.create('client1', 'Random', [
         {
           name: 'c1-ex1',
           duration: 3,
@@ -46,7 +46,7 @@
     }, 2.5 * $scope.intervalLength);
     $timeout(function() {
       var client2;
-      client2 = Client.create('client2', [
+      client2 = Client.create('client2', 'AverageJoe', [
         {
           name: 'c2-ex1',
           duration: 2,
@@ -65,7 +65,7 @@
     }, 3.5 * $scope.intervalLength);
     $timeout(function() {
       var client3;
-      client3 = Client.create('client3', [
+      client3 = Client.create('client3', 'AverageJoe', [
         {
           name: 'c3-ex1',
           duration: 1,
@@ -80,7 +80,7 @@
     }, 1.5 * $scope.intervalLength);
     return $timeout(function() {
       var client4;
-      client4 = Client.create('client4', [
+      client4 = Client.create('client4', 'AverageJoe', [
         {
           name: 'c4-ex1',
           duration: 1,
