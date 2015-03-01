@@ -59,6 +59,9 @@ angular.module('gymsym').factory 'BaseClient', () ->
 
       @returnDumbells()
 
+    returnDumbell: (slot, dumbell) ->
+      @rack.putDumbell slot, dumbell
+
     returnDumbells: () ->
       throw new Error "Override returndumbells() in child class"
 

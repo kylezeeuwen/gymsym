@@ -76,6 +76,10 @@
         return this.returnDumbells();
       };
 
+      BaseClient.prototype.returnDumbell = function(slot, dumbell) {
+        return this.rack.putDumbell(slot, dumbell);
+      };
+
       BaseClient.prototype.returnDumbells = function() {
         throw new Error("Override returndumbells() in child class");
       };

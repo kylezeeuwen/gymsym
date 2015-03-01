@@ -1,5 +1,6 @@
 (function() {
-  angular.module('gymsym').controller('MainCtrl', function($scope, Dumbell, Rack, Gym, Client, RandomClient, $timeout, $interval) {
+  angular.module('gymsym').controller('MainCtrl', function($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) {
+    $scope.duration = 34;
     $scope.rack1 = Rack.create(5, 5, 10, 10, 12, 12, 15, 15, 20, 20, 25, 25, 30, 30);
     $scope.rack1.putDumbell(0, Dumbell.create(5));
     $scope.rack1.putDumbell(1, Dumbell.create(5));
@@ -24,7 +25,7 @@
     }, $scope.intervalLength);
     $timeout(function() {
       return $interval.cancel($scope.intervals['main']);
-    }, 35 * $scope.intervalLength);
+    }, $scope.duration * $scope.intervalLength);
     $timeout(function() {
       var client1;
       client1 = Client.create('client1', 'Random', [
