@@ -7,6 +7,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
       
     constructor: (@uniqId, @name, workoutPlan) ->
       @workoutPlan = @validateWorkoutPlan workoutPlan
+      @xlastStatus = 'idle'
       @status = 'idle'
       @currentExercise = null
       @dumbells = []
@@ -15,6 +16,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
     
     advanceTime: (time) ->
       @time = time
+      @xlastStatus = @status
       switch @status
         when "idle" then @transitionsFromIdle()
         when "exercising" then @transitionsFromExercising()
@@ -58,6 +60,9 @@ angular.module('gymsym').factory 'BaseClient', () ->
       @currentExercise.endTime = @time
 
       @returnDumbells()
+
+    returnDumbell: (slot, dumbell) ->
+      @rack.putDumbell slot, dumbell
 
     returnDumbells: () ->
       throw new Error "Override returndumbells() in child class"

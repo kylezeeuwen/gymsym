@@ -39,10 +39,6 @@ angular.module('gymsym').factory 'Gym', () ->
         if newStatus is 'finished'
           @removeClient client
 
-      #console.log "Time #{@time}"
-      #console.log @dump()
-      #console.log JSON.stringify @dump().clients
-
     dump: () ->
       data =
         clients: []
@@ -53,5 +49,32 @@ angular.module('gymsym').factory 'Gym', () ->
         data.clients.push client.dump()
 
       data
+
+    dumbellDump: () ->
+      data = @dump()
+
+      dumbells = []
+      for client in data.clients
+        for dumbell, index in client.dumbells
+          dumbells.push {
+            id: dumbell.uniqId
+            weight: dumbell.props.weight
+            status: 'client'
+            statusId: client.id
+            position: if index == 0 then 'L' else 'R'
+            xlastStatus: client.xlastStatus
+            currentStatus: client.status
+          }
+
+      for slot in data.rack
+        if slot.dumbell
+          dumbells.push {
+            id: slot.dumbell.uniqId
+            weight: slot.dumbell.props.weight
+            status: 'rack'
+            statusId: slot.index
+          }
+
+      dumbells
 
   Gym

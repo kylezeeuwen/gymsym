@@ -178,6 +178,7 @@
           };
           if (space.dumbell instanceof Dumbell) {
             spaceData.weight = space.dumbell.weight();
+            spaceData.dumbell = space.dumbell;
           }
           return spaceData;
         };

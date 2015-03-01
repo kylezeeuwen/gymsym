@@ -22,9 +22,9 @@
           availableCorrectSlots = this.rack.getEmptySlotsForDumbell(dumbell);
           availableSlots = this.rack.getEmptySlots();
           if (availableCorrectSlots.length > 0) {
-            _results.push(this.rack.putDumbell(availableCorrectSlots[0], dumbell));
+            _results.push(this.returnDumbell(availableCorrectSlots[0], dumbell));
           } else if (availableSlots.length > 0) {
-            _results.push(this.rack.putDumbell(availableSlots[0], dumbell));
+            _results.push(this.returnDumbell(availableSlots[0], dumbell));
           } else {
             throw new Error("Cannot return dumbell " + (dumbell.weight()) + ": rack is full");
           }
