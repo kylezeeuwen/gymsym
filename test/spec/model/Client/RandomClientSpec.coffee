@@ -1,8 +1,8 @@
-describe 'AverageJoeClient:', ->
+describe 'RandomClient:', ->
 
-  beforeEach -> 
+  beforeEach ->
     window.angular.mock.module 'gymsym'
-  
+
   beforeEach inject (_Client_, _Rack_, _Dumbell_) ->
     @Client = _Client_
     @Rack = _Rack_
@@ -24,8 +24,8 @@ describe 'AverageJoeClient:', ->
       @client.returnDumbells()
 
       expect(@rack.spaces).toEqual [
-        { label: 2, dumbell: null }
-        { label: 1, dumbell: @d2 }
+        { label: 2, dumbell: null, fresh: false }
+        { label: 1, dumbell: @d2, fresh: true }
       ]
 
       expect(Math.random).toHaveBeenCalled

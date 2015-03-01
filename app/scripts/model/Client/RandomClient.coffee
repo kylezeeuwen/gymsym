@@ -4,7 +4,7 @@ angular.module('gymsym').factory 'RandomClient', (BaseClient) ->
 
     @create: (id,name,program) ->
       new RandomClient id, name, program
-      
+
     returnDumbells: () ->
       while dumbell = @dumbells.shift()
         availableSlots = @rack.getEmptySlots()
@@ -13,7 +13,7 @@ angular.module('gymsym').factory 'RandomClient', (BaseClient) ->
           @rack.putDumbell availableSlots[pick], dumbell
         else
           throw new Error "Cannot return dumbell #{dumbell}: rack is full"
-    
+
     clientType: 'RandomClient'
 
   RandomClient

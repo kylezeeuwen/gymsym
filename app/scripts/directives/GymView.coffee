@@ -7,12 +7,13 @@ app.directive 'gymView', ->
   controller: 'GymViewController'
   scope:
     gym: '='
+    intervalLength: '='
   link: (scope, iElement, iAttrs, controller) ->
 
     # dimensions
     scope.margin = {top: 19.5, right: 19.5, bottom: 19.5, left: 19.5}
     scope.width = 1000 - scope.margin.right
-    scope.height = 150 - scope.margin.top - scope.margin.bottom
+    scope.height = 200 - scope.margin.top - scope.margin.bottom
 
     #Create the SVG container and set the origin.
     scope.svg = d3.select('#' + iElement.attr('id')).append('svg')
@@ -21,39 +22,124 @@ app.directive 'gymView', ->
       .append('g')
       .attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')')
 
-    scope.rack = scope.svg.append('g')
-      .attr('class', 'rack')
-
-    scope.clientArea = scope.svg.append('g')
-      .attr('class', 'client-area')
-      .attr('transform', 'translate(20,70)')
-
-
 app.controller 'GymViewController', ($scope, $interval, $timeout) ->
 
-  $scope.key = (d) ->
+  $scope.clientCoord = (id) ->
+    return {
+      x: 25 + parseInt(id) * 100
+      y: 120
+    }
+
+  $scope.rackCoord = (id) ->
+    return {
+      x: 10 + parseInt(id) * 60
+      y: 20
+    }
+
+  $scope.getId = (d) ->
     d.id
 
   $scope.watchGym = () ->
-    $scope.gym.dump()
+    $scope.gym.time
 
-  $scope.updateGym = (gymData) ->
-    return unless 'rack' of gymData
-    $scope.updateRack gymData.rack, gymData.time
-    $scope.updateClients gymData.clients, gymData.time
+  $scope.updateGym = () ->
 
-  $scope.updateRack = (rackData, time) ->
+    #unify output
+    gymData = $scope.gym.dump()
+    dumbells = $scope.gym.listAllDumbells()
 
-    rackSpaces = $scope.rack.selectAll('.rack-space')
-      .data(rackData, $scope.key)
+    #return unless 'rack' of gymData
+    $scope.updateRack gymData.rack
+    $scope.updateClients gymData.clients
+    $scope.updateDumbells dumbells
+
+  $scope.updateDumbells = (dumbellData) ->
+
+    allDumbells = $scope.svg.selectAll('.dumbell-container')
+      .data(dumbellData, $scope.getId)
+
+    enteringDumbells = allDumbells.enter().append('g')
+      .attr('class', 'dumbell-container')
+
+    enteringDumbells.append('circle')
+      .attr('class', 'dumbell')
+      .attr('fill', 'black')
+      .attr('r', 18)
+
+    enteringDumbells.append('text')
+      .attr('class', 'dumbell-text')
+      .attr('dx', -8)
+      .attr('dy', 5)
+      .attr('fill', 'white')
+      .text( (d) -> d.dumbell.weight() )
+
+    #@TODO this should only apply to dumbells in transition, not all dumbells
+    allDumbells
+      .transition()
+      .ease('linear')
+      .duration($scope.intervalLength)
+      .attr('transform', (d) =>
+
+        #@TODO this is config
+        rangeOfCornyMotion = 10
+
+        coord = null
+        if d.status is 'rack'
+          coord = @rackCoord d.slotIndex
+
+        else if d.status is 'client'
+
+          coord = @clientCoord d.client.id()
+          cornyModifiers = d.client.cornyMotion $scope.gym.time
+          if d.hand is 'L'
+            coord.x -= 15
+            coord.y += cornyModifiers['L']['y'] * rangeOfCornyMotion
+            coord.x += cornyModifiers['L']['x'] * rangeOfCornyMotion
+          else if d.hand is 'R'
+            coord.x += 25
+            coord.y += cornyModifiers['R']['y'] * rangeOfCornyMotion
+            coord.x += cornyModifiers['R']['x'] * rangeOfCornyMotion
+          else
+            throw new Error "unknown dumbell position #{d.position}"
+        else
+          throw new Error "unknown dumbell status #{d.status}"
+
+        "translate(#{coord.x},#{coord.y})"
+      )
+      .each('start', (d) ->
+        d3.select(this).classed({
+          'client': false
+          'rack': false
+          'tranitioning': true
+        })
+      )
+      .each('end', (d) ->
+        if d.status is 'client'
+          d3.select(this).classed({
+            'client': true
+            'rack': false
+            'tranitioning': false
+          })
+        else if d.status is 'rack'
+          d3.select(this).classed({
+            'client': false
+            'rack': true
+            'tranitioning': false
+          })
+      )
+
+  $scope.updateRack = (rackData) ->
+
+    rackSpaces = $scope.svg.selectAll('.rack-space-container')
+      .data(rackData, $scope.getId)
 
     enteringRackSpaces = rackSpaces.enter().append('g')
       .attr('class', 'rack-space-container')
-      .attr('transform', (d) ->
-        x = parseInt(d.index) * 60 + 10
-        return 'translate(' + x + ',10)'
+      .attr('transform', (d) =>
+        coord = $scope.rackCoord d.index
+        return "translate(#{coord.x},#{coord.y})"
       )
-    
+
     enteringRackSpaces.append('circle')
       .attr('class', 'rack-space')
       .attr('r', 25)
@@ -68,62 +154,33 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         d.label
       )
 
-    enteringRackSpaces.append('circle')
-      .attr('class', 'dumbell')
-      .attr('r', 18)
-
-    enteringRackSpaces.append('text')
-      .attr('class', 'dumbell-text')
-      .attr('dx', -8)
-      .attr('dy', 5)
-      .attr('fill', 'white')
-
-    allRackSpaces = $scope.rack.selectAll('.rack-space')
-      .data(rackData, $scope.key)
+    rackSpaces.select('.rack-space')
       .attr('fill', (d) ->
         if d.weight is null
           'white'
         else
           if d.weight == d.label
-            'rgba(0,255,0,0.2)'
+            'rgba(0,255,0,0.2)' #translucent green @TODO use classes instead
           else
-            'rgba(255,0,0,0.2)'
-      )
-
-    allDumbellSlots = $scope.rack.selectAll('.dumbell')
-      .data(rackData, $scope.key)
-      .attr('fill', (d) ->
-        if d.weight is null
-          'white'
-        else
-          'black'
-      )
-
-    AllDumbellText = $scope.rack.selectAll('.dumbell-text')
-      .data(rackData, $scope.key)
-      .text( (d) ->
-        d.weight
+            'rgba(255,0,0,0.2)' #translucent red @TODO use classes instead
       )
 
   $scope.updateClients = (clientData, time) ->
 
-    clients = $scope.clientArea.selectAll('.client-shape')
-      .data(clientData, $scope.key)
+    clients = $scope.svg.selectAll('.client-container')
+      .data(clientData, $scope.getId)
 
     enteringClients = clients.enter().append('g')
       .attr('class', 'client-container')
-      .attr('transform', (d) ->
-        x = d.id * 100
-        return 'translate(' + x + ',10)'
+      .attr('transform', (d) =>
+        coord = @clientCoord d.id
+        return "translate(#{coord.x},#{coord.y})"
       )
 
     enteringClients.append('rect')
       .attr('class', 'client-shape')
       .attr('width', 10)
       .attr('height', 40)
-
-    allClientShapes = $scope.clientArea.selectAll('.client-shape')
-      .data(clientData, $scope.key)
       .attr('fill', (d) ->
         if d.type is 'RandomClient'
           'red'
@@ -131,46 +188,20 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
           'green'
       )
 
-    allClientContainers = $scope.clientArea.selectAll('.client-container')
-      .data(clientData, $scope.key)
-      .each( (d) ->      
+    enteringClients.append('text')
+      .attr('class', 'client-status')
+      .attr('dx', -20)
+      .attr('dy', 55)
 
-        clientDumbellData = []
-        for dumbell, index in d.dumbells
-          record = dumbell.dump()
-          record.index = index
-          clientDumbellData.push record
+    clients.select('.client-status')
+      .text (d) ->
+        switch d.status
+          when 'idle' then 'resting'
+          when 'exercising'then ''
+          when 'waiting' then 'angry!'
 
-        enteringClientWeightContainers = d3.select(this).selectAll('.client-weights')
-          .data(clientDumbellData, $scope.key)
-          .enter()
-          .append('g')
-          .attr('class', 'client-weight-container')
- 
-        enteringClientWeightContainers.append('circle')
-          .attr('class', 'dumbell')
-          .attr('r', 18)
 
-        enteringClientWeightContainers.append('text')
-          .attr('class', 'dumbell-text')
-          .attr('dx', -8)
-          .attr('dy', 5)
-          .attr('fill', 'white')
-          .text( (d) ->
-            d.weight
-          )
 
-        allClientWeightContainers = d3.select(this).selectAll('.client-weight-container')
-          .attr('transform', (d) ->
-            x = if d.index == 0 then -15 else 10 + 15
-            y = if (time % 2 == d.index) then -2 else 2
-            return 'translate(' + x + ',' + y + ')'
-          )  
-        
-        leavingClientWeightContainers = d3.select(this).selectAll('.client-weight-container')
-          .data(clientDumbellData, $scope.key)
-          .exit().remove()
-      )
-
+    exitingClients = clients.exit().remove()
 
   $scope.$watch $scope.watchGym, $scope.updateGym, true

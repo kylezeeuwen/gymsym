@@ -85,6 +85,11 @@ gulp.task('copy', function () {
     dot: true
   }).pipe(gulp.dest('dist/bower_components'));
 
+  gulp.src([
+    'app/data/**/*'
+  ], {
+    dot: true
+  }).pipe(gulp.dest('dist/data'));
 });
 
 gulp.task('connect', ['build'], function () {

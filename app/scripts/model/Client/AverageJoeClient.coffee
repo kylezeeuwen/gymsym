@@ -10,9 +10,9 @@ angular.module('gymsym').factory 'AverageJoeClient', (BaseClient) ->
         availableCorrectSlots = @rack.getEmptySlotsForDumbell dumbell
         availableSlots = @rack.getEmptySlots()
         if availableCorrectSlots.length > 0
-          @rack.putDumbell availableCorrectSlots[0], dumbell
+          @returnDumbell availableCorrectSlots[0], dumbell
         else if availableSlots.length > 0
-          @rack.putDumbell availableSlots[0], dumbell
+          @returnDumbell availableSlots[0], dumbell
         else
           throw new Error "Cannot return dumbell #{dumbell.weight()}: rack is full"
 
