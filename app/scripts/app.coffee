@@ -14,4 +14,10 @@ angular.module('gymsym', [
       body:
         templateUrl: 'views/main.html'
 
+  $stateProvider.state 'simple',
+    url: '/simple'
+    views:
+      body:
+        templateUrl: 'views/simple.html'
+
   return

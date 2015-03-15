@@ -71,8 +71,8 @@
         return data;
       };
 
-      Gym.prototype.dumbellDump = function() {
-        var client, data, dumbell, dumbells, index, slot, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+      Gym.prototype.listAllDumbells = function() {
+        var client, data, dumbell, dumbells, hand, index, slot, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
         data = this.dump();
         dumbells = [];
         _ref = data.clients;
@@ -81,14 +81,15 @@
           _ref1 = client.dumbells;
           for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
             dumbell = _ref1[index];
+            hand = index === 0 ? 'L' : 'R';
             dumbells.push({
+              client: client.ref,
               id: dumbell.uniqId,
               weight: dumbell.props.weight,
               status: 'client',
               statusId: client.id,
-              position: index === 0 ? 'L' : 'R',
-              xlastStatus: client.xlastStatus,
-              currentStatus: client.status
+              position: hand,
+              cornyMotion: client.cornyMotion
             });
           }
         }

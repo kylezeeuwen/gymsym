@@ -11,6 +11,14 @@
         }
       }
     });
+    $stateProvider.state('simple', {
+      url: '/simple',
+      views: {
+        body: {
+          templateUrl: 'views/simple.html'
+        }
+      }
+    });
   });
 
 }).call(this);

@@ -39,6 +39,7 @@ angular.module('gymsym').factory 'Gym', () ->
         if newStatus is 'finished'
           @removeClient client
 
+    # @TODO split into listAllClients and listAllRacks
     dump: () ->
       data =
         clients: []
@@ -50,20 +51,21 @@ angular.module('gymsym').factory 'Gym', () ->
 
       data
 
-    dumbellDump: () ->
+    listAllDumbells: () ->
       data = @dump()
 
       dumbells = []
       for client in data.clients
         for dumbell, index in client.dumbells
+          hand = if index == 0 then 'L' else 'R'
           dumbells.push {
+            client: client.ref
             id: dumbell.uniqId
             weight: dumbell.props.weight
             status: 'client'
             statusId: client.id
-            position: if index == 0 then 'L' else 'R'
-            xlastStatus: client.xlastStatus
-            currentStatus: client.status
+            position: hand
+            cornyMotion: client.cornyMotion
           }
 
       for slot in data.rack

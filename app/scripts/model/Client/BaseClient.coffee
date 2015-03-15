@@ -4,19 +4,23 @@ angular.module('gymsym').factory 'BaseClient', () ->
 
     @create: (id,name,program) ->
       throw new Error "override in child class"
-      
+         
     constructor: (@uniqId, @name, workoutPlan) ->
       @workoutPlan = @validateWorkoutPlan workoutPlan
-      @xlastStatus = 'idle'
       @status = 'idle'
       @currentExercise = null
       @dumbells = []
       #get time from service dont pass it around
       @time = 0
     
+    cornyMotion: (hand) ->
+      return { x: 0.05, y: 0.95 }
+
+    textX: () ->
+      console.log 'sweet as chips bru?'
+
     advanceTime: (time) ->
       @time = time
-      @xlastStatus = @status
       switch @status
         when "idle" then @transitionsFromIdle()
         when "exercising" then @transitionsFromExercising()
@@ -41,6 +45,9 @@ angular.module('gymsym').factory 'BaseClient', () ->
       if @currentExercise.startTime + @currentExercise.duration < @time
         @finishExercise()
         @status = 'idle'
+
+    getDumbells: () ->
+      @dumbells
 
     getNextExercise: () ->
       _.findWhere @workoutPlan, status: 'pending'
@@ -106,6 +113,8 @@ angular.module('gymsym').factory 'BaseClient', () ->
         name: @name
         status: @status
         dumbells: @dumbells
+        cornyMotion: @cornyMotion()
+        ref: @
       }
 
   BaseClient

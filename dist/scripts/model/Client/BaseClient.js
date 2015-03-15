@@ -10,16 +10,25 @@
         this.uniqId = uniqId;
         this.name = name;
         this.workoutPlan = this.validateWorkoutPlan(workoutPlan);
-        this.xlastStatus = 'idle';
         this.status = 'idle';
         this.currentExercise = null;
         this.dumbells = [];
         this.time = 0;
       }
 
+      BaseClient.prototype.cornyMotion = function(hand) {
+        return {
+          x: 0.05,
+          y: 0.95
+        };
+      };
+
+      BaseClient.prototype.textX = function() {
+        return console.log('sweet as chips bru?');
+      };
+
       BaseClient.prototype.advanceTime = function(time) {
         this.time = time;
-        this.xlastStatus = this.status;
         switch (this.status) {
           case "idle":
             this.transitionsFromIdle();
@@ -53,6 +62,10 @@
           this.finishExercise();
           return this.status = 'idle';
         }
+      };
+
+      BaseClient.prototype.getDumbells = function() {
+        return this.dumbells;
       };
 
       BaseClient.prototype.getNextExercise = function() {
@@ -142,7 +155,9 @@
           type: this.type(),
           name: this.name,
           status: this.status,
-          dumbells: this.dumbells
+          dumbells: this.dumbells,
+          cornyMotion: this.cornyMotion(),
+          ref: this
         };
       };
 

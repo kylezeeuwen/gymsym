@@ -133,6 +133,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
         
         if space.dumbell instanceof Dumbell
           spaceData.weight = space.dumbell.weight()
+          #@TODO are both needed?
           spaceData.dumbell = space.dumbell
 
         spaceData
