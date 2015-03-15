@@ -75,21 +75,19 @@
         var client, data, dumbell, dumbells, hand, index, slot, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
         data = this.dump();
         dumbells = [];
-        _ref = data.clients;
+        _ref = this.clients;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           client = _ref[_i];
-          _ref1 = client.dumbells;
+          _ref1 = client.getDumbells();
           for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
             dumbell = _ref1[index];
-            hand = index === 0 ? 'L' : 'R';
-            dumbells.push({
-              client: client.ref,
-              id: dumbell.uniqId,
-              weight: dumbell.props.weight,
+            hand = dumbells.push({
+              id: dumbell.id(),
               status: 'client',
-              statusId: client.id,
-              position: hand,
-              cornyMotion: client.cornyMotion
+              hand: index === 0 ? 'L' : 'R',
+              client: client,
+              dumbell: dumbell,
+              weight: dumbell.props.weight
             });
           }
         }
@@ -98,10 +96,11 @@
           slot = _ref2[_k];
           if (slot.dumbell) {
             dumbells.push({
-              id: slot.dumbell.uniqId,
-              weight: slot.dumbell.props.weight,
+              id: slot.dumbell.id(),
               status: 'rack',
-              statusId: slot.index
+              slotIndex: slot.index,
+              dumbell: slot.dumbell,
+              weight: slot.dumbell.props.weight
             });
           }
         }

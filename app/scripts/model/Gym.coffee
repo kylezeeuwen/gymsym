@@ -55,26 +55,27 @@ angular.module('gymsym').factory 'Gym', () ->
       data = @dump()
 
       dumbells = []
-      for client in data.clients
-        for dumbell, index in client.dumbells
-          hand = if index == 0 then 'L' else 'R'
+
+      for client in @clients
+        for dumbell, index in client.getDumbells()
+          hand = 
           dumbells.push {
-            client: client.ref
-            id: dumbell.uniqId
-            weight: dumbell.props.weight
+            id: dumbell.id()
             status: 'client'
-            statusId: client.id
-            position: hand
-            cornyMotion: client.cornyMotion
+            hand: if index == 0 then 'L' else 'R'
+            client: client
+            dumbell: dumbell
+            weight: dumbell.props.weight
           }
 
       for slot in data.rack
         if slot.dumbell
           dumbells.push {
-            id: slot.dumbell.uniqId
-            weight: slot.dumbell.props.weight
+            id: slot.dumbell.id()
             status: 'rack'
-            statusId: slot.index
+            slotIndex: slot.index
+            dumbell: slot.dumbell
+            weight: slot.dumbell.props.weight
           }
 
       dumbells

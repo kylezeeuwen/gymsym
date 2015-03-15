@@ -77,7 +77,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .attr('dx', -8)
       .attr('dy', 5)
       .attr('fill', 'white')
-      .text( (d) -> d.weight )
+      .text( (d) -> d.dumbell.weight() )
 
     #@TODO this should only apply to dumbells in transition, not all dumbells
     allDumbells
@@ -86,25 +86,26 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .duration(1000)
       .attr('transform', (d) =>
         
-        cornyMotionModulus = $scope.gym.time % 2
+        
+        #@TODO this is config
         rangeOfCornyMotion = 10
 
         coord = null
         if d.status is 'rack'
-          coord = @rackCoord d.statusId
+          coord = @rackCoord d.slotIndex
+
         else if d.status is 'client'
 
-          coord = @clientCoord d.statusId
-          if d.position is 'L'
+          coord = @clientCoord d.client.id()
+          cornyModifiers = d.client.cornyMotion $scope.gym.time
+          if d.hand is 'L'
             coord.x -= 15
-            if cornyMotionModulus == 0
-              coord.y -= rangeOfCornyMotion * d.cornyMotion.y
-              coord.x -= rangeOfCornyMotion * d.cornyMotion.x
-          else if d.position is 'R'
+            coord.y += cornyModifiers['L']['y'] * rangeOfCornyMotion
+            coord.x += cornyModifiers['L']['x'] * rangeOfCornyMotion
+          else if d.hand is 'R'
             coord.x += 25
-            if cornyMotionModulus == 1 #have them alternate hands
-              coord.y -= rangeOfCornyMotion * d.cornyMotion.y
-              coord.x += rangeOfCornyMotion * d.cornyMotion.x
+            coord.y += cornyModifiers['R']['y'] * rangeOfCornyMotion
+            coord.x += cornyModifiers['R']['x'] * rangeOfCornyMotion
           else
             throw new Error "unknown dumbell position #{d.position}"
         else

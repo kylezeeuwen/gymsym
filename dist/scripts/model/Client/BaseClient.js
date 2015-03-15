@@ -16,15 +16,30 @@
         this.time = 0;
       }
 
-      BaseClient.prototype.cornyMotion = function(hand) {
-        return {
-          x: 0.05,
-          y: 0.95
-        };
-      };
-
-      BaseClient.prototype.textX = function() {
-        return console.log('sweet as chips bru?');
+      BaseClient.prototype.cornyMotion = function(time) {
+        if (time % 2 === 0) {
+          return {
+            L: {
+              x: -0.5,
+              y: -0.5
+            },
+            R: {
+              x: 0.5,
+              y: -0.5
+            }
+          };
+        } else {
+          return {
+            L: {
+              x: 0,
+              y: 0
+            },
+            R: {
+              x: 0,
+              y: 0
+            }
+          };
+        }
       };
 
       BaseClient.prototype.advanceTime = function(time) {

@@ -67,30 +67,26 @@
       enteringDumbells = allDumbells.enter().append('g').attr('class', 'dumbell-container');
       enteringDumbells.append('circle').attr('class', 'dumbell').attr('fill', 'black').attr('r', 18);
       enteringDumbells.append('text').attr('class', 'dumbell-text').attr('dx', -8).attr('dy', 5).attr('fill', 'white').text(function(d) {
-        return d.weight;
+        return d.dumbell.weight();
       });
       return allDumbells.transition().ease('linear').duration(1000).attr('transform', (function(_this) {
         return function(d) {
-          var coord, cornyMotionModulus, rangeOfCornyMotion;
-          cornyMotionModulus = $scope.gym.time % 2;
+          var coord, cornyModifiers, rangeOfCornyMotion;
           rangeOfCornyMotion = 10;
           coord = null;
           if (d.status === 'rack') {
-            coord = _this.rackCoord(d.statusId);
+            coord = _this.rackCoord(d.slotIndex);
           } else if (d.status === 'client') {
-            coord = _this.clientCoord(d.statusId);
-            if (d.position === 'L') {
+            coord = _this.clientCoord(d.client.id());
+            cornyModifiers = d.client.cornyMotion($scope.gym.time);
+            if (d.hand === 'L') {
               coord.x -= 15;
-              if (cornyMotionModulus === 0) {
-                coord.y -= rangeOfCornyMotion * d.cornyMotion.y;
-                coord.x -= rangeOfCornyMotion * d.cornyMotion.x;
-              }
-            } else if (d.position === 'R') {
+              coord.y += cornyModifiers['L']['y'] * rangeOfCornyMotion;
+              coord.x += cornyModifiers['L']['x'] * rangeOfCornyMotion;
+            } else if (d.hand === 'R') {
               coord.x += 25;
-              if (cornyMotionModulus === 1) {
-                coord.y -= rangeOfCornyMotion * d.cornyMotion.y;
-                coord.x += rangeOfCornyMotion * d.cornyMotion.x;
-              }
+              coord.y += cornyModifiers['R']['y'] * rangeOfCornyMotion;
+              coord.x += cornyModifiers['R']['x'] * rangeOfCornyMotion;
             } else {
               throw new Error("unknown dumbell position " + d.position);
             }

@@ -13,11 +13,17 @@ angular.module('gymsym').factory 'BaseClient', () ->
       #get time from service dont pass it around
       @time = 0
     
-    cornyMotion: (hand) ->
-      return { x: 0.05, y: 0.95 }
-
-    textX: () ->
-      console.log 'sweet as chips bru?'
+    cornyMotion: (time) ->
+      if time % 2 == 0
+        return {
+          L: { x: -0.5, y: -0.5 }
+          R: { x: 0.5, y: -0.5 }
+        }
+      else
+        return { 
+          L: { x: 0, y: 0 }
+          R: { x: 0, y: 0 }
+        }
 
     advanceTime: (time) ->
       @time = time
