@@ -1,6 +1,6 @@
 angular.module('gymsym').controller 'MainCtrl', ($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) ->
   
-  $scope.duration = 34
+  $scope.duration = 36
 
   $scope.rack1 = Rack.create 5, 5, 10, 10, 12, 12, 15, 15, 20, 20, 25, 25, 30, 30
 

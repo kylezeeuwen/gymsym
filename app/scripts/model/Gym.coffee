@@ -39,10 +39,6 @@ angular.module('gymsym').factory 'Gym', () ->
         if newStatus is 'finished'
           @removeClient client
 
-      #console.log "Time #{@time}"
-      #console.log @dump()
-      #console.log JSON.stringify @dump().clients
-
     dump: () ->
       data =
         clients: []
@@ -66,6 +62,8 @@ angular.module('gymsym').factory 'Gym', () ->
             status: 'client'
             statusId: client.id
             position: if index == 0 then 'L' else 'R'
+            xlastStatus: client.xlastStatus
+            currentStatus: client.status
           }
 
       for slot in data.rack

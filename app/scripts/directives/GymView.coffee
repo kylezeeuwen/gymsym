@@ -12,7 +12,7 @@ app.directive 'gymView', ->
     # dimensions
     scope.margin = {top: 19.5, right: 19.5, bottom: 19.5, left: 19.5}
     scope.width = 1000 - scope.margin.right
-    scope.height = 150 - scope.margin.top - scope.margin.bottom
+    scope.height = 200 - scope.margin.top - scope.margin.bottom
 
     #Create the SVG container and set the origin.
     scope.svg = d3.select('#' + iElement.attr('id')).append('svg')
@@ -26,12 +26,12 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
   $scope.clientCoord = (id) ->
     return {
       x: 25 + parseInt(id) * 100
-      y: 80
+      y: 120
     }
 
   $scope.rackCoord = (id) ->
     return {
-      x: parseInt(id) * 60 + 10
+      x: 10 + parseInt(id) * 60
       y: 20
     }
 
@@ -42,7 +42,6 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
   $scope.watchGym = () ->
     #XXX TODO rename dumbellDump
     $scope.gym.dumbellDump()
-    #$scope.gym.dump()
 
   $scope.updateGym = () ->
     gymData = $scope.gym.dump()
@@ -52,6 +51,14 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     $scope.updateRack gymData.rack
     $scope.updateClients gymData.clients
     $scope.updateDumbells dumbells
+    $scope.makeDumbellsWorkout()
+
+  $scope.makeDumbellsWorkout = () ->
+    console.log 'make dumbells workout'
+    dumbells = $scope.svg.selectAll('.dumbell-container.client')
+      .each( (d) ->
+        console.log "#{d.id}"
+      )
 
   $scope.updateDumbells = (dumbellData) ->
 
@@ -73,24 +80,60 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .attr('fill', 'white')
       .text( (d) -> d.weight )
 
-
-    allDumbells.transition().ease('linear').duration(1000).attr('transform', (d) =>
-      console.log "in the transform d is #{JSON.stringify(d,{},2)}"
-      
-      coords = null
-      if d.status is 'rack'
-        coords = @rackCoord d.statusId
-      else if d.status is 'client'
-        coords = @clientCoord d.statusId
-        if d.position is 'L'
-          coords.x -= 15
-        else
-          coords.x += 25
-      else
-        throw new Error "unknown dumbell status #{d.status}"
-      
-      "translate(#{coords.x},#{coords.y})"
+    allDumbells.classed('exercising', (d) ->
+      return false unless d.status is 'client'
+      console.log "in the functions!"
+      console.log JSON.stringify d, {}, 2
+      console.log "lS: #{d.lastStatus} cS: #{d.currentStatus}"
+      if d.lastStatus is 'exercising' and d.currentStatus is 'exercising'
+        console.log "#{d.id} is exercising!"
+        return true
+      return false
     )
+
+    allDumbells
+      .transition()
+      .ease('linear')
+      .duration(1000)
+      .attr('transform', (d) =>
+        
+        coord = null
+        if d.status is 'rack'
+          coord = @rackCoord d.statusId
+        else if d.status is 'client'
+          coord = @clientCoord d.statusId
+          if d.position is 'L'
+            coord.x -= 15
+          else
+            coord.x += 25
+        else
+          throw new Error "unknown dumbell status #{d.status}"
+        
+        "translate(#{coord.x},#{coord.y})"
+      )
+      .each('start', (d) ->
+        d3.select(this).classed({
+          'client': false
+          'rack': false
+        })
+      )
+      .each('end', (d) ->
+        if d.status is 'client'
+          d3.select(this).classed({
+            'client': true
+            'rack': false
+          })
+        else if d.status is 'rack'
+          d3.select(this).classed({
+            'client': false
+            'rack': true
+          })
+      )
+
+    #allDumbells = $scope.svg.selectAll('.dumbell-container')
+    #  .data(dumbellData, $scope.key)
+
+
   $scope.updateRack = (rackData) ->
 
     rackSpaces = $scope.svg.selectAll('.rack-space-container')
@@ -144,8 +187,6 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .attr('class', 'client-shape')
       .attr('width', 10)
       .attr('height', 40)
-
-    allClientShapes = clients.select('.client-shape')
       .attr('fill', (d) ->
         if d.type is 'RandomClient'
           'red'

@@ -10,6 +10,7 @@
         this.uniqId = uniqId;
         this.name = name;
         this.workoutPlan = this.validateWorkoutPlan(workoutPlan);
+        this.xlastStatus = 'idle';
         this.status = 'idle';
         this.currentExercise = null;
         this.dumbells = [];
@@ -18,6 +19,7 @@
 
       BaseClient.prototype.advanceTime = function(time) {
         this.time = time;
+        this.xlastStatus = this.status;
         switch (this.status) {
           case "idle":
             this.transitionsFromIdle();

@@ -86,7 +86,9 @@
               weight: dumbell.props.weight,
               status: 'client',
               statusId: client.id,
-              position: index === 0 ? 'L' : 'R'
+              position: index === 0 ? 'L' : 'R',
+              xlastStatus: client.xlastStatus,
+              currentStatus: client.status
             });
           }
         }

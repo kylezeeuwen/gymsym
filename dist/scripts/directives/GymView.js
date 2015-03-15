@@ -20,7 +20,7 @@
           left: 19.5
         };
         scope.width = 1000 - scope.margin.right;
-        scope.height = 150 - scope.margin.top - scope.margin.bottom;
+        scope.height = 200 - scope.margin.top - scope.margin.bottom;
         return scope.svg = d3.select('#' + iElement.attr('id')).append('svg').attr('width', scope.width + scope.margin.left + scope.margin.right).attr('height', scope.height + scope.margin.top + scope.margin.bottom).append('g').attr('transform', 'translate(' + scope.margin.left + ',' + scope.margin.top + ')');
       }
     };
@@ -30,12 +30,12 @@
     $scope.clientCoord = function(id) {
       return {
         x: 25 + parseInt(id) * 100,
-        y: 80
+        y: 120
       };
     };
     $scope.rackCoord = function(id) {
       return {
-        x: parseInt(id) * 60 + 10,
+        x: 10 + parseInt(id) * 60,
         y: 20
       };
     };
@@ -51,7 +51,15 @@
       dumbells = $scope.gym.dumbellDump();
       $scope.updateRack(gymData.rack);
       $scope.updateClients(gymData.clients);
-      return $scope.updateDumbells(dumbells);
+      $scope.updateDumbells(dumbells);
+      return $scope.makeDumbellsWorkout();
+    };
+    $scope.makeDumbellsWorkout = function() {
+      var dumbells;
+      console.log('make dumbells workout');
+      return dumbells = $scope.svg.selectAll('.dumbell-container.client').each(function(d) {
+        return console.log("" + d.id);
+      });
     };
     $scope.updateDumbells = function(dumbellData) {
       var allDumbells, enteringDumbells;
@@ -61,26 +69,55 @@
       enteringDumbells.append('text').attr('class', 'dumbell-text').attr('dx', -8).attr('dy', 5).attr('fill', 'white').text(function(d) {
         return d.weight;
       });
+      allDumbells.classed('exercising', function(d) {
+        if (d.status !== 'client') {
+          return false;
+        }
+        console.log("in the functions!");
+        console.log(JSON.stringify(d, {}, 2));
+        console.log("lS: " + d.lastStatus + " cS: " + d.currentStatus);
+        if (d.lastStatus === 'exercising' && d.currentStatus === 'exercising') {
+          console.log("" + d.id + " is exercising!");
+          return true;
+        }
+        return false;
+      });
       return allDumbells.transition().ease('linear').duration(1000).attr('transform', (function(_this) {
         return function(d) {
-          var coords;
-          console.log("in the transform d is " + (JSON.stringify(d, {}, 2)));
-          coords = null;
+          var coord;
+          coord = null;
           if (d.status === 'rack') {
-            coords = _this.rackCoord(d.statusId);
+            coord = _this.rackCoord(d.statusId);
           } else if (d.status === 'client') {
-            coords = _this.clientCoord(d.statusId);
+            coord = _this.clientCoord(d.statusId);
             if (d.position === 'L') {
-              coords.x -= 15;
+              coord.x -= 15;
             } else {
-              coords.x += 25;
+              coord.x += 25;
             }
           } else {
             throw new Error("unknown dumbell status " + d.status);
           }
-          return "translate(" + coords.x + "," + coords.y + ")";
+          return "translate(" + coord.x + "," + coord.y + ")";
         };
-      })(this));
+      })(this)).each('start', function(d) {
+        return d3.select(this).classed({
+          'client': false,
+          'rack': false
+        });
+      }).each('end', function(d) {
+        if (d.status === 'client') {
+          return d3.select(this).classed({
+            'client': true,
+            'rack': false
+          });
+        } else if (d.status === 'rack') {
+          return d3.select(this).classed({
+            'client': false,
+            'rack': true
+          });
+        }
+      });
     };
     $scope.updateRack = function(rackData) {
       var enteringRackSpaces, rackSpaces;
@@ -109,7 +146,7 @@
       });
     };
     $scope.updateClients = function(clientData, time) {
-      var allClientShapes, clients, enteringClients;
+      var clients, enteringClients;
       clients = $scope.svg.selectAll('.client-container').data(clientData, $scope.key);
       enteringClients = clients.enter().append('g').attr('class', 'client-container').attr('transform', (function(_this) {
         return function(d) {
@@ -118,8 +155,7 @@
           return "translate(" + coord.x + "," + coord.y + ")";
         };
       })(this));
-      enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40);
-      return allClientShapes = clients.select('.client-shape').attr('fill', function(d) {
+      return enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40).attr('fill', function(d) {
         if (d.type === 'RandomClient') {
           return 'red';
         } else {
