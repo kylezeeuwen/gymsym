@@ -14,16 +14,31 @@ angular.module('gymsym').factory 'BaseClient', () ->
       @time = 0
     
     cornyMotion: (time) ->
-      if time % 2 == 0
+
+      halfLife = 16
+      unless halfLife > 2 and halfLife % 2 == 0
+        throw new Error "invalid halfLife #{{halfLife}}, must be even and > 2."
+
+      stretchedPosition = {
+        L: { x: -0.5, y: -0.5 }
+        R: { x: 0.5, y: -0.5 }
+      }
+
+      getStretchedPosition = (percentage) ->
         return {
-          L: { x: -0.5, y: -0.5 }
-          R: { x: 0.5, y: -0.5 }
+          L: { x: percentage * stretchedPosition['L']['x'], y: percentage * stretchedPosition['L']['y'] }
+          R: { x: percentage * stretchedPosition['R']['x'], y: percentage * stretchedPosition['R']['y'] }
         }
+
+      index = time % (2 * halfLife)
+
+      if index < halfLife
+        percentage = index / (halfLife - 1)
+        return getStretchedPosition percentage
       else
-        return { 
-          L: { x: 0, y: 0 }
-          R: { x: 0, y: 0 }
-        }
+        flipped = (2*halfLife) - 1 - index
+        percentage = flipped / (halfLife - 1)
+        return getStretchedPosition percentage
 
     advanceTime: (time) ->
       @time = time
@@ -119,7 +134,6 @@ angular.module('gymsym').factory 'BaseClient', () ->
         name: @name
         status: @status
         dumbells: @dumbells
-        cornyMotion: @cornyMotion()
         ref: @
       }
 

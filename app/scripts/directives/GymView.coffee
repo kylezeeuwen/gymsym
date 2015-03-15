@@ -7,6 +7,7 @@ app.directive 'gymView', ->
   controller: 'GymViewController'
   scope:
     gym: '='
+    intervalLength: '='
   link: (scope, iElement, iAttrs, controller) ->
 
     # dimensions
@@ -49,15 +50,6 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     $scope.updateRack gymData.rack
     $scope.updateClients gymData.clients
     $scope.updateDumbells dumbells
-    $scope.makeDumbellsWorkout()
-
-  # @TODO this is incomplete
-  $scope.makeDumbellsWorkout = () ->
-    console.log 'make dumbells workout'
-    dumbells = $scope.svg.selectAll('.dumbell-container.client')
-      .each( (d) ->
-        console.log "#{d.id}"
-      )
 
   $scope.updateDumbells = (dumbellData) ->
 
@@ -83,10 +75,9 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     allDumbells
       .transition()
       .ease('linear')
-      .duration(1000)
+      .duration($scope.intervalLength)
       .attr('transform', (d) =>
-        
-        
+                
         #@TODO this is config
         rangeOfCornyMotion = 10
 
@@ -97,6 +88,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         else if d.status is 'client'
 
           coord = @clientCoord d.client.id()
+          console.log "calling cornyModifier on dumbell #{d.id}"
           cornyModifiers = d.client.cornyMotion $scope.gym.time
           if d.hand is 'L'
             coord.x -= 15

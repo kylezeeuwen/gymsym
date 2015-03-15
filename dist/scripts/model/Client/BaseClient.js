@@ -17,28 +17,43 @@
       }
 
       BaseClient.prototype.cornyMotion = function(time) {
-        if (time % 2 === 0) {
+        var flipped, getStretchedPosition, halfLife, index, percentage, stretchedPosition;
+        halfLife = 16;
+        if (!(halfLife > 2 && halfLife % 2 === 0)) {
+          throw new Error("invalid halfLife " + {
+            halfLife: halfLife
+          } + ", must be even and > 2.");
+        }
+        stretchedPosition = {
+          L: {
+            x: -0.5,
+            y: -0.5
+          },
+          R: {
+            x: 0.5,
+            y: -0.5
+          }
+        };
+        getStretchedPosition = function(percentage) {
           return {
             L: {
-              x: -0.5,
-              y: -0.5
+              x: percentage * stretchedPosition['L']['x'],
+              y: percentage * stretchedPosition['L']['y']
             },
             R: {
-              x: 0.5,
-              y: -0.5
+              x: percentage * stretchedPosition['R']['x'],
+              y: percentage * stretchedPosition['R']['y']
             }
           };
+        };
+        index = time % (2 * halfLife);
+        if (index < halfLife) {
+          percentage = index / (halfLife - 1);
+          return getStretchedPosition(percentage);
         } else {
-          return {
-            L: {
-              x: 0,
-              y: 0
-            },
-            R: {
-              x: 0,
-              y: 0
-            }
-          };
+          flipped = (2 * halfLife) - 1 - index;
+          percentage = flipped / (halfLife - 1);
+          return getStretchedPosition(percentage);
         }
       };
 
@@ -171,7 +186,6 @@
           name: this.name,
           status: this.status,
           dumbells: this.dumbells,
-          cornyMotion: this.cornyMotion(),
           ref: this
         };
       };

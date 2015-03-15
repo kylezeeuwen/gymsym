@@ -10,7 +10,8 @@
       template: '<div></div>',
       controller: 'GymViewController',
       scope: {
-        gym: '='
+        gym: '=',
+        intervalLength: '='
       },
       link: function(scope, iElement, iAttrs, controller) {
         scope.margin = {
@@ -51,15 +52,7 @@
       dumbells = $scope.gym.listAllDumbells();
       $scope.updateRack(gymData.rack);
       $scope.updateClients(gymData.clients);
-      $scope.updateDumbells(dumbells);
-      return $scope.makeDumbellsWorkout();
-    };
-    $scope.makeDumbellsWorkout = function() {
-      var dumbells;
-      console.log('make dumbells workout');
-      return dumbells = $scope.svg.selectAll('.dumbell-container.client').each(function(d) {
-        return console.log("" + d.id);
-      });
+      return $scope.updateDumbells(dumbells);
     };
     $scope.updateDumbells = function(dumbellData) {
       var allDumbells, enteringDumbells;
@@ -69,7 +62,7 @@
       enteringDumbells.append('text').attr('class', 'dumbell-text').attr('dx', -8).attr('dy', 5).attr('fill', 'white').text(function(d) {
         return d.dumbell.weight();
       });
-      return allDumbells.transition().ease('linear').duration(1000).attr('transform', (function(_this) {
+      return allDumbells.transition().ease('linear').duration($scope.intervalLength).attr('transform', (function(_this) {
         return function(d) {
           var coord, cornyModifiers, rangeOfCornyMotion;
           rangeOfCornyMotion = 10;
@@ -78,6 +71,7 @@
             coord = _this.rackCoord(d.slotIndex);
           } else if (d.status === 'client') {
             coord = _this.clientCoord(d.client.id());
+            console.log("calling cornyModifier on dumbell " + d.id);
             cornyModifiers = d.client.cornyMotion($scope.gym.time);
             if (d.hand === 'L') {
               coord.x -= 15;

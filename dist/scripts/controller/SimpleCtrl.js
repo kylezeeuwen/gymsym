@@ -1,7 +1,7 @@
 (function() {
   angular.module('gymsym').controller('SimpleCtrl', function($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) {
     $scope.duration = 4;
-    $scope.intervalLength = 3000;
+    $scope.intervalLength = 1000;
     $scope.rack1 = Rack.create(5, 10);
     $scope.rack1.putDumbell(0, Dumbell.create(5));
     $scope.rack1.putDumbell(1, Dumbell.create(10));
@@ -9,8 +9,7 @@
     $scope.gym.setRack($scope.rack1);
     $scope.intervals = {};
     $scope.intervals['main'] = $interval(function() {
-      $scope.gym.advanceTime();
-      return console.log("Gym Time is now : " + $scope.gym.time);
+      return $scope.gym.advanceTime();
     }, $scope.intervalLength);
     $timeout(function() {
       return $interval.cancel($scope.intervals['main']);

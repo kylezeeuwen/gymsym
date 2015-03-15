@@ -1,7 +1,7 @@
 angular.module('gymsym').controller 'SimpleCtrl', ($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) ->
   
   $scope.duration = 4
-  $scope.intervalLength = 3000
+  $scope.intervalLength = 1000
 
   $scope.rack1 = Rack.create 5, 10
 
@@ -14,7 +14,6 @@ angular.module('gymsym').controller 'SimpleCtrl', ($scope, Dumbell, Rack, Gym, C
 
   $scope.intervals['main'] = $interval ->
     $scope.gym.advanceTime()
-    console.log "Gym Time is now : #{$scope.gym.time}"
   , $scope.intervalLength
 
   $timeout ->
