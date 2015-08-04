@@ -15,6 +15,10 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       @spaces = (@makeSpace(label) for label in labels)
       @uniqId = Rack.getNewId()
 
+    advanceTime: (time) ->
+      @spaces.forEach (space) ->
+        space.fresh = false
+
     makeSpace: (labelText) ->
       label = parseInt labelText
       if isNaN labelText
@@ -23,6 +27,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
       return {
         label: label
         dumbell: null
+        fresh: false
       }
 
     id: () ->
@@ -44,21 +49,22 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
     putDumbell: (slotIndexArg,dumbell) ->
       if not (dumbell instanceof Dumbell)
         throw new Error 'invalid dumbell call putDumbell(index,dumbell)'
-      
+
       slotIndex = parseInt(slotIndexArg)
 
       @validateSlotIndex slotIndex
 
       if @spaces[slotIndex]['dumbell']
         throw new Error 'space full'
-      
+
       @spaces[slotIndex]['dumbell'] = dumbell
+      @spaces[slotIndex]['fresh'] = true
 
     takeFromSlot: (slotIndexArg) ->
       slotIndex = parseInt(slotIndexArg)
 
       @validateSlotIndex slotIndex
-      
+
       if not @spaces[slotIndex]['dumbell']
         throw new Error 'space empty'
 
@@ -71,7 +77,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
     hasWeights: (requiredWeights) ->
       availableWeights = []
       _.map @spaces, (space) ->
-        availableWeights.push space.dumbell.weight() if space.dumbell
+        availableWeights.push space.dumbell.weight() if (space.dumbell and !space.fresh)
 
       hasAll = true
       for weight in requiredWeights
@@ -82,7 +88,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
         else
           availableWeights.splice index, 1
 
-      hasAll    
+      hasAll
 
     takeDumbells: (requiredWeights) ->
       dumbells = []
@@ -102,7 +108,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
     getSlotIndexesForWeight: (weight) ->
       indexes = []
       for index, space of @spaces
-        indexes.push(parseInt index) if space.dumbell?.weight() == weight
+        indexes.push(parseInt index) if space.dumbell?.weight() == weight and !space.fresh
 
       indexes
 
@@ -130,7 +136,7 @@ angular.module('gymsym').factory 'Rack', (Dumbell) ->
           weight: null
           index: parseInt(index)
           id: "#{id}-#{index}"
-        
+
         if space.dumbell instanceof Dumbell
           spaceData.weight = space.dumbell.weight()
           #@TODO are both needed?

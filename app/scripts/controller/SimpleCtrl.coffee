@@ -1,13 +1,13 @@
 angular.module('gymsym').controller 'SimpleCtrl', ($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) ->
-  
-  $scope.duration = 4
+
+  $scope.duration = 30
   $scope.intervalLength = 1000
 
   $scope.rack1 = Rack.create 5, 10
 
   $scope.rack1.putDumbell 0, Dumbell.create 5
   $scope.rack1.putDumbell 1, Dumbell.create 10
-  
+
   $scope.gym = Gym.create()
   $scope.gym.setRack $scope.rack1
   $scope.intervals = {}

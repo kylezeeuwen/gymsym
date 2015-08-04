@@ -4,7 +4,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
 
     @create: (id,name,program) ->
       throw new Error "override in child class"
-         
+
     constructor: (@uniqId, @name, workoutPlan) ->
       @workoutPlan = @validateWorkoutPlan workoutPlan
       @status = 'idle'
@@ -12,10 +12,12 @@ angular.module('gymsym').factory 'BaseClient', () ->
       @dumbells = []
       #get time from service dont pass it around
       @time = 0
-    
+      @restDuration = 7
+      @restTimer = @restDuration
+
     cornyMotion: (time) ->
 
-      halfLife = 16
+      halfLife = 4
       unless halfLife > 2 and halfLife % 2 == 0
         throw new Error "invalid halfLife #{{halfLife}}, must be even and > 2."
 
@@ -43,13 +45,18 @@ angular.module('gymsym').factory 'BaseClient', () ->
     advanceTime: (time) ->
       @time = time
       switch @status
-        when "idle" then @transitionsFromIdle()
-        when "exercising" then @transitionsFromExercising()
+        when 'idle' then @transitionsFromIdle()
+        when 'waiting' then @transitionsFromIdle()
+        when 'exercising' then @transitionsFromExercising()
         else throw new Error "Invalid client state #{clientStatus} for client #{client.name} at time #{@time}"
 
       @status
 
     transitionsFromIdle: () ->
+      @restTimer++
+      if @restTimer < @restDuration
+        return
+
       nextExercise = @getNextExercise()
       if nextExercise
         requiredWeights = nextExercise.dumbells
@@ -58,6 +65,8 @@ angular.module('gymsym').factory 'BaseClient', () ->
           dumbells = @rack.takeDumbells requiredWeights
           @startExercise nextExercise, dumbells
           @status = 'exercising'
+        else
+          @status = 'waiting'
 
       else
         @status = 'finished'
@@ -66,6 +75,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
       if @currentExercise.startTime + @currentExercise.duration < @time
         @finishExercise()
         @status = 'idle'
+        @restTimer = 0
 
     getDumbells: () ->
       @dumbells
@@ -112,7 +122,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
           place = "workoutPlan[#{index}].dumbells[#{wIndex}]"
           ex.dumbells[wIndex] = parseInt weight
           throw new Error "#{place} non-numeric weight" if isNaN ex.dumbells[wIndex]
-        
+
         #pending, active, complete
         ex.status = 'pending'
         ex.id = index

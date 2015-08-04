@@ -43,6 +43,8 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
     $scope.gym.time
 
   $scope.updateGym = () ->
+
+    #unify output
     gymData = $scope.gym.dump()
     dumbells = $scope.gym.listAllDumbells()
 
@@ -77,7 +79,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
       .ease('linear')
       .duration($scope.intervalLength)
       .attr('transform', (d) =>
-                
+
         #@TODO this is config
         rangeOfCornyMotion = 10
 
@@ -88,7 +90,6 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         else if d.status is 'client'
 
           coord = @clientCoord d.client.id()
-          console.log "calling cornyModifier on dumbell #{d.id}"
           cornyModifiers = d.client.cornyMotion $scope.gym.time
           if d.hand is 'L'
             coord.x -= 15
@@ -102,7 +103,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
             throw new Error "unknown dumbell position #{d.position}"
         else
           throw new Error "unknown dumbell status #{d.status}"
-        
+
         "translate(#{coord.x},#{coord.y})"
       )
       .each('start', (d) ->
@@ -138,7 +139,7 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         coord = $scope.rackCoord d.index
         return "translate(#{coord.x},#{coord.y})"
       )
-    
+
     enteringRackSpaces.append('circle')
       .attr('class', 'rack-space')
       .attr('r', 25)
@@ -186,5 +187,21 @@ app.controller 'GymViewController', ($scope, $interval, $timeout) ->
         else
           'green'
       )
+
+    enteringClients.append('text')
+      .attr('class', 'client-status')
+      .attr('dx', -20)
+      .attr('dy', 55)
+
+    clients.select('.client-status')
+      .text (d) ->
+        switch d.status
+          when 'idle' then 'resting'
+          when 'exercising'then ''
+          when 'waiting' then 'angry!'
+
+
+
+    exitingClients = clients.exit().remove()
 
   $scope.$watch $scope.watchGym, $scope.updateGym, true

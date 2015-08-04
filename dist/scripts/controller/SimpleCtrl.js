@@ -1,6 +1,6 @@
 (function() {
   angular.module('gymsym').controller('SimpleCtrl', function($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) {
-    $scope.duration = 4;
+    $scope.duration = 30;
     $scope.intervalLength = 1000;
     $scope.rack1 = Rack.create(5, 10);
     $scope.rack1.putDumbell(0, Dumbell.create(5));

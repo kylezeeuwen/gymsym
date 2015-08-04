@@ -6,19 +6,21 @@
         throw new Error("override in child class");
       };
 
-      function BaseClient(uniqId, name, workoutPlan) {
+      function BaseClient(uniqId, name1, workoutPlan) {
         this.uniqId = uniqId;
-        this.name = name;
+        this.name = name1;
         this.workoutPlan = this.validateWorkoutPlan(workoutPlan);
         this.status = 'idle';
         this.currentExercise = null;
         this.dumbells = [];
         this.time = 0;
+        this.restDuration = 7;
+        this.restTimer = this.restDuration;
       }
 
       BaseClient.prototype.cornyMotion = function(time) {
         var flipped, getStretchedPosition, halfLife, index, percentage, stretchedPosition;
-        halfLife = 16;
+        halfLife = 4;
         if (!(halfLife > 2 && halfLife % 2 === 0)) {
           throw new Error("invalid halfLife " + {
             halfLife: halfLife
@@ -60,10 +62,13 @@
       BaseClient.prototype.advanceTime = function(time) {
         this.time = time;
         switch (this.status) {
-          case "idle":
+          case 'idle':
             this.transitionsFromIdle();
             break;
-          case "exercising":
+          case 'waiting':
+            this.transitionsFromIdle();
+            break;
+          case 'exercising':
             this.transitionsFromExercising();
             break;
           default:
@@ -74,6 +79,10 @@
 
       BaseClient.prototype.transitionsFromIdle = function() {
         var dumbells, nextExercise, requiredWeights;
+        this.restTimer++;
+        if (this.restTimer < this.restDuration) {
+          return;
+        }
         nextExercise = this.getNextExercise();
         if (nextExercise) {
           requiredWeights = nextExercise.dumbells;
@@ -81,6 +90,8 @@
             dumbells = this.rack.takeDumbells(requiredWeights);
             this.startExercise(nextExercise, dumbells);
             return this.status = 'exercising';
+          } else {
+            return this.status = 'waiting';
           }
         } else {
           return this.status = 'finished';
@@ -90,7 +101,8 @@
       BaseClient.prototype.transitionsFromExercising = function(client) {
         if (this.currentExercise.startTime + this.currentExercise.duration < this.time) {
           this.finishExercise();
-          return this.status = 'idle';
+          this.status = 'idle';
+          return this.restTimer = 0;
         }
       };
 
@@ -130,36 +142,36 @@
       };
 
       BaseClient.prototype.validateWorkoutPlan = function(workoutPlan) {
-        var ex, index, place, wIndex, weight, _i, _j, _len, _len1, _ref;
+        var ex, i, index, j, len, len1, place, ref, wIndex, weight;
         if (!(workoutPlan instanceof Array)) {
           throw new Error('workoutPlan must be array');
         }
-        for (index = _i = 0, _len = workoutPlan.length; _i < _len; index = ++_i) {
+        for (index = i = 0, len = workoutPlan.length; i < len; index = ++i) {
           ex = workoutPlan[index];
           place = "workoutPlan[" + index + "]";
           if (!('name' in ex)) {
-            throw new Error("" + place + " missing name");
+            throw new Error(place + " missing name");
           }
           if (!('duration' in ex)) {
-            throw new Error("" + place + " missing duration");
+            throw new Error(place + " missing duration");
           }
           ex.duration = parseInt(ex.duration);
           if (isNaN(ex.duration)) {
-            throw new Error("" + place + " non-numeric duration");
+            throw new Error(place + " non-numeric duration");
           }
           if (!('dumbells' in ex)) {
-            throw new Error("" + place + " missing dumbells");
+            throw new Error(place + " missing dumbells");
           }
           if (!(ex.dumbells instanceof Array)) {
-            throw new Error("" + place + " dumbells must be array");
+            throw new Error(place + " dumbells must be array");
           }
-          _ref = ex.dumbells;
-          for (wIndex = _j = 0, _len1 = _ref.length; _j < _len1; wIndex = ++_j) {
-            weight = _ref[wIndex];
+          ref = ex.dumbells;
+          for (wIndex = j = 0, len1 = ref.length; j < len1; wIndex = ++j) {
+            weight = ref[wIndex];
             place = "workoutPlan[" + index + "].dumbells[" + wIndex + "]";
             ex.dumbells[wIndex] = parseInt(weight);
             if (isNaN(ex.dumbells[wIndex])) {
-              throw new Error("" + place + " non-numeric weight");
+              throw new Error(place + " non-numeric weight");
             }
           }
           ex.status = 'pending';

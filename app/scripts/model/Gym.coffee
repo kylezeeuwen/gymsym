@@ -28,16 +28,23 @@ angular.module('gymsym').factory 'Gym', () ->
 
     removeClient: (exitingClient) ->
       #TODO clients should be dictionary by ID ?
-      @clients = _.filter @clients, (client) -> 
+      @clients = _.filter @clients, (client) ->
         client.id() != exitingClient.id()
+
+    clientCount: () ->
+      @clients.length
 
     advanceTime: () ->
       @time += 1
 
+      @rack.advanceTime @time
       for client in @clients
-        newStatus = client.advanceTime(@time)
+        newStatus = client.advanceTime @time
         if newStatus is 'finished'
+          console.log 'client finished'
           @removeClient client
+
+      @time
 
     # @TODO split into listAllClients and listAllRacks
     dump: () ->
@@ -45,7 +52,7 @@ angular.module('gymsym').factory 'Gym', () ->
         clients: []
         rack: @rack.dump()
         time: @time
-        
+
       for client in @clients
         data.clients.push client.dump()
 
@@ -58,7 +65,7 @@ angular.module('gymsym').factory 'Gym', () ->
 
       for client in @clients
         for dumbell, index in client.getDumbells()
-          hand = 
+          hand =
           dumbells.push {
             id: dumbell.id()
             status: 'client'

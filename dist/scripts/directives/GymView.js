@@ -71,7 +71,6 @@
             coord = _this.rackCoord(d.slotIndex);
           } else if (d.status === 'client') {
             coord = _this.clientCoord(d.client.id());
-            console.log("calling cornyModifier on dumbell " + d.id);
             cornyModifiers = d.client.cornyMotion($scope.gym.time);
             if (d.hand === 'L') {
               coord.x -= 15;
@@ -138,7 +137,7 @@
       });
     };
     $scope.updateClients = function(clientData, time) {
-      var clients, enteringClients;
+      var clients, enteringClients, exitingClients;
       clients = $scope.svg.selectAll('.client-container').data(clientData, $scope.getId);
       enteringClients = clients.enter().append('g').attr('class', 'client-container').attr('transform', (function(_this) {
         return function(d) {
@@ -147,13 +146,25 @@
           return "translate(" + coord.x + "," + coord.y + ")";
         };
       })(this));
-      return enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40).attr('fill', function(d) {
+      enteringClients.append('rect').attr('class', 'client-shape').attr('width', 10).attr('height', 40).attr('fill', function(d) {
         if (d.type === 'RandomClient') {
           return 'red';
         } else {
           return 'green';
         }
       });
+      enteringClients.append('text').attr('class', 'client-status').attr('dx', -20).attr('dy', 55);
+      clients.select('.client-status').text(function(d) {
+        switch (d.status) {
+          case 'idle':
+            return 'resting';
+          case 'exercising':
+            return '';
+          case 'waiting':
+            return 'angry!';
+        }
+      });
+      return exitingClients = clients.exit().remove();
     };
     return $scope.$watch($scope.watchGym, $scope.updateGym, true);
   });

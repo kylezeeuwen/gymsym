@@ -1,107 +1,157 @@
 (function() {
   angular.module('gymsym').controller('MainCtrl', function($scope, Dumbell, Rack, Gym, Client, $timeout, $interval) {
-    $scope.duration = 60 * 38;
-    $scope.intervalLength = 20;
-    $scope.rack1 = Rack.create(5, 5, 10, 10, 12, 12, 15, 15, 20, 20, 25, 25, 30, 30);
-    $scope.rack1.putDumbell(0, Dumbell.create(5));
-    $scope.rack1.putDumbell(1, Dumbell.create(5));
-    $scope.rack1.putDumbell(2, Dumbell.create(10));
-    $scope.rack1.putDumbell(3, Dumbell.create(10));
-    $scope.rack1.putDumbell(4, Dumbell.create(12));
-    $scope.rack1.putDumbell(5, Dumbell.create(12));
-    $scope.rack1.putDumbell(6, Dumbell.create(15));
-    $scope.rack1.putDumbell(7, Dumbell.create(15));
-    $scope.rack1.putDumbell(8, Dumbell.create(20));
-    $scope.rack1.putDumbell(9, Dumbell.create(20));
-    $scope.rack1.putDumbell(10, Dumbell.create(25));
-    $scope.rack1.putDumbell(11, Dumbell.create(25));
-    $scope.rack1.putDumbell(12, Dumbell.create(30));
-    $scope.rack1.putDumbell(13, Dumbell.create(30));
-    $scope.gym = Gym.create();
-    $scope.gym.setRack($scope.rack1);
-    $scope.intervals = {};
-    $scope.intervals['main'] = $interval(function() {
-      return $scope.gym.advanceTime();
+    var inProgress;
+    $scope.intervalLength = 400;
+    $scope.rackConfig = [5, 5, 10, 10, 12, 12, 15, 15, 20, 20, 25, 25, 30, 30];
+    $scope.clients = [
+      {
+        name: 'client1',
+        type: 'AverageJoe',
+        arrival: 5,
+        program: [
+          {
+            name: 'c1-ex1',
+            duration: 6,
+            dumbells: [10, 10]
+          }, {
+            name: 'c1-ex2',
+            duration: 9,
+            dumbells: [5, 5]
+          }, {
+            name: 'c1-ex3',
+            duration: 12,
+            dumbells: [20, 20]
+          }, {
+            name: 'c1-ex1',
+            duration: 12,
+            dumbells: [10, 10]
+          }, {
+            name: 'c1-ex2',
+            duration: 9,
+            dumbells: [25, 25]
+          }, {
+            name: 'c1-ex3',
+            duration: 4,
+            dumbells: [5, 5]
+          }
+        ]
+      }, {
+        name: 'client2',
+        type: 'AverageJoe',
+        arrival: 9,
+        program: [
+          {
+            name: 'c1-ex1',
+            duration: 6,
+            dumbells: [20]
+          }, {
+            name: 'c1-ex2',
+            duration: 11,
+            dumbells: [10, 10]
+          }, {
+            name: 'c1-ex3',
+            duration: 4,
+            dumbells: [20, 20]
+          }, {
+            name: 'c1-ex4',
+            duration: 5,
+            dumbells: [15, 15]
+          }
+        ]
+      }, {
+        name: 'client3',
+        type: 'Random',
+        arrival: 15,
+        program: [
+          {
+            name: 'c1-ex1',
+            duration: 6,
+            dumbells: [30, 30]
+          }, {
+            name: 'c1-ex2',
+            duration: 9,
+            dumbells: [5, 5]
+          }, {
+            name: 'c1-ex3',
+            duration: 4,
+            dumbells: [10, 10]
+          }
+        ]
+      }, {
+        name: 'client2',
+        type: 'AverageJoe',
+        arrival: 21,
+        program: [
+          {
+            name: 'c1-ex1',
+            duration: 6,
+            dumbells: [20]
+          }, {
+            name: 'c1-ex2',
+            duration: 11,
+            dumbells: [10, 10]
+          }, {
+            name: 'c1-ex3',
+            duration: 4,
+            dumbells: [20, 20]
+          }, {
+            name: 'c1-ex4',
+            duration: 5,
+            dumbells: [15, 15]
+          }
+        ]
+      }, {
+        name: 'client4',
+        type: 'Random',
+        arrival: 21,
+        program: [
+          {
+            name: 'c1-ex1',
+            duration: 3,
+            dumbells: [30, 25]
+          }, {
+            name: 'c1-ex2',
+            duration: 6,
+            dumbells: [5, 5]
+          }, {
+            name: 'c1-ex3',
+            duration: 13,
+            dumbells: [10, 10]
+          }
+        ]
+      }
+    ];
+    $scope.done = false;
+    inProgress = $interval(function() {
+      var currentTime;
+      currentTime = $scope.gym.advanceTime();
+      $scope.checkForNewClients(currentTime);
+      if ($scope.firstClientArrived && $scope.gym.clientCount() === 0) {
+        $scope.done = true;
+        return $interval.cancel(inProgress);
+      }
     }, $scope.intervalLength);
-    $timeout(function() {
-      return $interval.cancel($scope.intervals['main']);
-    }, $scope.duration * $scope.intervalLength);
-    $timeout(function() {
-      var client1;
-      client1 = Client.create('client1', 'Random', [
-        {
-          name: 'c1-ex1',
-          duration: 600,
-          dumbells: [10, 10]
-        }, {
-          name: 'c1-ex2',
-          duration: 900,
-          dumbells: [5, 5]
-        }, {
-          name: 'c1-ex3',
-          duration: 450,
-          dumbells: [20, 20]
-        }
-      ]);
-      return $scope.gym.addClient(client1);
-    }, 10 * $scope.intervalLength);
-    $timeout(function() {
-      var client2;
-      client2 = Client.create('client2', 'AverageJoe', [
-        {
-          name: 'c2-ex1',
-          duration: 300,
-          dumbells: [10]
-        }, {
-          name: 'c2-ex2',
-          duration: 60,
-          dumbells: [25, 25]
-        }, {
-          name: 'c2-ex3',
-          duration: 1200,
-          dumbells: [15]
-        }
-      ]);
-      return $scope.gym.addClient(client2);
-    }, 70 * $scope.intervalLength);
-    $timeout(function() {
-      var client3;
-      client3 = Client.create('client3', 'AverageJoe', [
-        {
-          name: 'c3-ex1',
-          duration: 1200,
-          dumbells: [30]
-        }, {
-          name: 'c3-ex2',
-          duration: 600,
-          dumbells: [12, 12]
-        }
-      ]);
-      return $scope.gym.addClient(client3);
-    }, 110 * $scope.intervalLength);
-    return $timeout(function() {
-      var client4;
-      client4 = Client.create('client4', 'AverageJoe', [
-        {
-          name: 'c4-ex1',
-          duration: 100,
-          dumbells: [5]
-        }, {
-          name: 'c4-ex2',
-          duration: 500,
-          dumbells: [25, 25]
-        }, {
-          name: 'c4-ex3',
-          duration: 200,
-          dumbells: [15, 15]
-        }, {
-          name: 'c4-ex4',
-          duration: 600,
-          dumbells: [30]
-        }
-      ]);
-      return $scope.gym.addClient(client4);
-    }, 180 * $scope.intervalLength);
+    $scope.init = function() {
+      var rack;
+      $scope.gym = Gym.create();
+      rack = Rack.create.apply(Rack, $scope.rackConfig);
+      $scope.rackConfig.forEach(function(weight, index) {
+        return rack.putDumbell(index, Dumbell.create(weight));
+      });
+      return $scope.gym.setRack(rack);
+    };
+    $scope.firstClientArrived = false;
+    $scope.checkForNewClients = function(currentTime) {
+      var newClients;
+      newClients = $scope.clients.filter(function(clientData) {
+        return clientData.arrival === currentTime;
+      });
+      return newClients.forEach(function(client) {
+        $scope.firstClientArrived = true;
+        return $scope.gym.addClient(Client.create(client.name, client.type, client.program));
+      });
+    };
+    return $scope.init();
   });
 
 }).call(this);

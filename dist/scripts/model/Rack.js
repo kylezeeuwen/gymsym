@@ -1,5 +1,5 @@
 (function() {
-  var __slice = [].slice;
+  var slice = [].slice;
 
   angular.module('gymsym').factory('Rack', function(Dumbell) {
     var Rack;
@@ -13,7 +13,7 @@
 
       Rack.create = function() {
         var labels;
-        labels = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        labels = 1 <= arguments.length ? slice.call(arguments, 0) : [];
         return new Rack(labels);
       };
 
@@ -21,16 +21,22 @@
         var label;
         this.numSlots = labels.length;
         this.spaces = (function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = labels.length; _i < _len; _i++) {
-            label = labels[_i];
-            _results.push(this.makeSpace(label));
+          var i, len, results;
+          results = [];
+          for (i = 0, len = labels.length; i < len; i++) {
+            label = labels[i];
+            results.push(this.makeSpace(label));
           }
-          return _results;
+          return results;
         }).call(this);
         this.uniqId = Rack.getNewId();
       }
+
+      Rack.prototype.advanceTime = function(time) {
+        return this.spaces.forEach(function(space) {
+          return space.fresh = false;
+        });
+      };
 
       Rack.prototype.makeSpace = function(labelText) {
         var label;
@@ -40,7 +46,8 @@
         }
         return {
           label: label,
-          dumbell: null
+          dumbell: null,
+          fresh: false
         };
       };
 
@@ -74,7 +81,8 @@
         if (this.spaces[slotIndex]['dumbell']) {
           throw new Error('space full');
         }
-        return this.spaces[slotIndex]['dumbell'] = dumbell;
+        this.spaces[slotIndex]['dumbell'] = dumbell;
+        return this.spaces[slotIndex]['fresh'] = true;
       };
 
       Rack.prototype.takeFromSlot = function(slotIndexArg) {
@@ -90,16 +98,16 @@
       };
 
       Rack.prototype.hasWeights = function(requiredWeights) {
-        var availableWeights, hasAll, index, weight, _i, _len;
+        var availableWeights, hasAll, i, index, len, weight;
         availableWeights = [];
         _.map(this.spaces, function(space) {
-          if (space.dumbell) {
+          if (space.dumbell && !space.fresh) {
             return availableWeights.push(space.dumbell.weight());
           }
         });
         hasAll = true;
-        for (_i = 0, _len = requiredWeights.length; _i < _len; _i++) {
-          weight = requiredWeights[_i];
+        for (i = 0, len = requiredWeights.length; i < len; i++) {
+          weight = requiredWeights[i];
           index = _.indexOf(availableWeights, weight);
           if (index === -1) {
             hasAll = false;
@@ -112,10 +120,10 @@
       };
 
       Rack.prototype.takeDumbells = function(requiredWeights) {
-        var dumbells, weight, _i, _len;
+        var dumbells, i, len, weight;
         dumbells = [];
-        for (_i = 0, _len = requiredWeights.length; _i < _len; _i++) {
-          weight = requiredWeights[_i];
+        for (i = 0, len = requiredWeights.length; i < len; i++) {
+          weight = requiredWeights[i];
           dumbells.push(this.takeFirstDumbellWithWeight(weight));
         }
         return dumbells;
@@ -131,12 +139,12 @@
       };
 
       Rack.prototype.getSlotIndexesForWeight = function(weight) {
-        var index, indexes, space, _ref, _ref1;
+        var index, indexes, ref, ref1, space;
         indexes = [];
-        _ref = this.spaces;
-        for (index in _ref) {
-          space = _ref[index];
-          if (((_ref1 = space.dumbell) != null ? _ref1.weight() : void 0) === weight) {
+        ref = this.spaces;
+        for (index in ref) {
+          space = ref[index];
+          if (((ref1 = space.dumbell) != null ? ref1.weight() : void 0) === weight && !space.fresh) {
             indexes.push(parseInt(index));
           }
         }
@@ -144,14 +152,14 @@
       };
 
       Rack.prototype.getEmptySlotsForDumbell = function(dumbell) {
-        var index, slots, space, _i, _len, _ref;
+        var i, index, len, ref, slots, space;
         if (dumbell && !(dumbell instanceof Dumbell)) {
           throw new 'invalid dumbell: not a Dumbell';
         }
         slots = [];
-        _ref = this.spaces;
-        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-          space = _ref[index];
+        ref = this.spaces;
+        for (index = i = 0, len = ref.length; i < len; index = ++i) {
+          space = ref[index];
           if (!space['dumbell']) {
             if ((!dumbell) || dumbell.weight() === space.label) {
               slots.push(index);
@@ -174,7 +182,7 @@
             label: space.label,
             weight: null,
             index: parseInt(index),
-            id: "" + id + "-" + index
+            id: id + "-" + index
           };
           if (space.dumbell instanceof Dumbell) {
             spaceData.weight = space.dumbell.weight();
@@ -183,12 +191,12 @@
           return spaceData;
         };
         data = (function() {
-          var _i, _ref, _results;
-          _results = [];
-          for (index = _i = 0, _ref = this.numSlots - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; index = 0 <= _ref ? ++_i : --_i) {
-            _results.push(printSpace(this.spaces[index], index));
+          var i, ref, results;
+          results = [];
+          for (index = i = 0, ref = this.numSlots - 1; 0 <= ref ? i <= ref : i >= ref; index = 0 <= ref ? ++i : --i) {
+            results.push(printSpace(this.spaces[index], index));
           }
-          return _results;
+          return results;
         }).call(this);
         return data;
       };
