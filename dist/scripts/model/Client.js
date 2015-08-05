@@ -6,6 +6,10 @@
 
       Client.curMaxId = -1;
 
+      Client.resetIdCounter = function() {
+        return this.curMaxId = -1;
+      };
+
       Client.getNewId = function() {
         this.curMaxId++;
         return this.curMaxId;

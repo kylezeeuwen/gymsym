@@ -4,4 +4,3 @@ compiled
 node_modules
 test/.bowerrc
 test/bower_components
-dist/

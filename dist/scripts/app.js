@@ -11,7 +11,7 @@
           '$stateParams', 'SimulationApi', function($stateParams, SimulationApi) {
             return SimulationApi.get({
               id: $stateParams.simulationId
-            });
+            }).$promise;
           }
         ]
       },

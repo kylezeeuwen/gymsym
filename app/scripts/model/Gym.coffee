@@ -41,7 +41,6 @@ angular.module('gymsym').factory 'Gym', () ->
       for client in @clients
         newStatus = client.advanceTime @time
         if newStatus is 'finished'
-          console.log 'client finished'
           @removeClient client
 
       @time

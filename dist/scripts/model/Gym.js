@@ -52,7 +52,6 @@
           client = ref[i];
           newStatus = client.advanceTime(this.time);
           if (newStatus === 'finished') {
-            console.log('client finished');
             this.removeClient(client);
           }
         }
