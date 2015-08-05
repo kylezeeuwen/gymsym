@@ -10,9 +10,9 @@ angular.module('gymsym').factory 'BaseClient', () ->
       @status = 'idle'
       @currentExercise = null
       @dumbells = []
-      #get time from service dont pass it around
+      #@TODO get time from service dont pass it around
       @time = 0
-      @restDuration = 7
+      @restDuration = 7 #@TODO config
       @restTimer = @restDuration
 
     cornyMotion: (time) ->
