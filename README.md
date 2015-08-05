@@ -14,3 +14,9 @@ See the project gitpage here : http://kylezeeuwen.github.io/gymsym/
 
 1. Run `gulp serve` (must have chrome web browser installed for the auto open to work)
 2. Go to `http://localhost:9000/`
+
+## Next Steps
+
+1. add non-zero time rest and put weights back periods
+2. add users xy in grid (could dynamic move ppl as they arrive)
+3. add randomized cornyMotion

@@ -4,25 +4,59 @@ angular.module('gymsym').factory 'BaseClient', () ->
 
     @create: (id,name,program) ->
       throw new Error "override in child class"
-      
+
     constructor: (@uniqId, @name, workoutPlan) ->
       @workoutPlan = @validateWorkoutPlan workoutPlan
       @status = 'idle'
       @currentExercise = null
       @dumbells = []
-      #get time from service dont pass it around
+      #@TODO get time from service dont pass it around
       @time = 0
-    
+      @restDuration = 7 #@TODO config
+      @restTimer = @restDuration
+
+    cornyMotion: (time) ->
+
+      halfLife = 4
+      unless halfLife > 2 and halfLife % 2 == 0
+        throw new Error "invalid halfLife #{{halfLife}}, must be even and > 2."
+
+      stretchedPosition = {
+        L: { x: -0.5, y: -0.5 }
+        R: { x: 0.5, y: -0.5 }
+      }
+
+      getStretchedPosition = (percentage) ->
+        return {
+          L: { x: percentage * stretchedPosition['L']['x'], y: percentage * stretchedPosition['L']['y'] }
+          R: { x: percentage * stretchedPosition['R']['x'], y: percentage * stretchedPosition['R']['y'] }
+        }
+
+      index = time % (2 * halfLife)
+
+      if index < halfLife
+        percentage = index / (halfLife - 1)
+        return getStretchedPosition percentage
+      else
+        flipped = (2*halfLife) - 1 - index
+        percentage = flipped / (halfLife - 1)
+        return getStretchedPosition percentage
+
     advanceTime: (time) ->
       @time = time
       switch @status
-        when "idle" then @transitionsFromIdle()
-        when "exercising" then @transitionsFromExercising()
+        when 'idle' then @transitionsFromIdle()
+        when 'waiting' then @transitionsFromIdle()
+        when 'exercising' then @transitionsFromExercising()
         else throw new Error "Invalid client state #{clientStatus} for client #{client.name} at time #{@time}"
 
       @status
 
     transitionsFromIdle: () ->
+      @restTimer++
+      if @restTimer < @restDuration
+        return
+
       nextExercise = @getNextExercise()
       if nextExercise
         requiredWeights = nextExercise.dumbells
@@ -31,6 +65,8 @@ angular.module('gymsym').factory 'BaseClient', () ->
           dumbells = @rack.takeDumbells requiredWeights
           @startExercise nextExercise, dumbells
           @status = 'exercising'
+        else
+          @status = 'waiting'
 
       else
         @status = 'finished'
@@ -39,6 +75,10 @@ angular.module('gymsym').factory 'BaseClient', () ->
       if @currentExercise.startTime + @currentExercise.duration < @time
         @finishExercise()
         @status = 'idle'
+        @restTimer = 0
+
+    getDumbells: () ->
+      @dumbells
 
     getNextExercise: () ->
       _.findWhere @workoutPlan, status: 'pending'
@@ -58,6 +98,9 @@ angular.module('gymsym').factory 'BaseClient', () ->
       @currentExercise.endTime = @time
 
       @returnDumbells()
+
+    returnDumbell: (slot, dumbell) ->
+      @rack.putDumbell slot, dumbell
 
     returnDumbells: () ->
       throw new Error "Override returndumbells() in child class"
@@ -79,7 +122,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
           place = "workoutPlan[#{index}].dumbells[#{wIndex}]"
           ex.dumbells[wIndex] = parseInt weight
           throw new Error "#{place} non-numeric weight" if isNaN ex.dumbells[wIndex]
-        
+
         #pending, active, complete
         ex.status = 'pending'
         ex.id = index
@@ -101,6 +144,7 @@ angular.module('gymsym').factory 'BaseClient', () ->
         name: @name
         status: @status
         dumbells: @dumbells
+        ref: @
       }
 
   BaseClient

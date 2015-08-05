@@ -1,0 +1,50 @@
+{
+  "rack" : [5, 5, 10, 10, 12, 12, 15, 15, 20, 20, 25, 25, 30, 30],
+  "clients": [
+    {
+      "name": "client1", "type": "Random", "arrival": 5,
+      "program": [
+        { "name": "c1-ex1", "duration": 6, "dumbells": [10,10] },
+        { "name": "c1-ex2", "duration": 9, "dumbells": [5,5] },
+        { "name": "c1-ex3", "duration": 12, "dumbells": [20,20] },
+        { "name": "c1-ex1", "duration": 12, "dumbells": [10,10] },
+        { "name": "c1-ex2", "duration": 9, "dumbells": [25,25] },
+        { "name": "c1-ex3", "duration": 4, "dumbells": [5,5] }
+      ]
+    },
+    {
+      "name": "client2", "type": "AverageJoe", "arrival": 9,
+      "program": [
+        { "name": "c1-ex1", "duration": 6, "dumbells": [20] },
+        { "name": "c1-ex2", "duration": 11, "dumbells": [10,10] },
+        { "name": "c1-ex3", "duration": 4, "dumbells": [20,20] },
+        { "name": "c1-ex4", "duration": 5, "dumbells": [15,15] }
+      ]
+    },
+    {
+      "name": "client3", "type": "Random", "arrival": 15,
+      "program": [
+        { "name": "c1-ex1", "duration": 6, "dumbells": [30,30] },
+        { "name": "c1-ex2", "duration": 9, "dumbells": [5,5] },
+        { "name": "c1-ex3", "duration": 4, "dumbells": [10,10] }
+      ]
+    },
+    {
+      "name": "client2", "type": "AverageJoe", "arrival": 21,
+      "program": [
+        { "name": "c1-ex1", "duration": 6, "dumbells": [20] },
+        { "name": "c1-ex2", "duration": 11, "dumbells": [10,10] },
+        { "name": "c1-ex3", "duration": 4, "dumbells": [20,20] },
+        { "name": "c1-ex4", "duration": 5, "dumbells": [15,15] }
+      ]
+    },
+    {
+      "name": "client4", "type": "AverageJoe", "arrival": 21,
+      "program": [
+        { "name": "c1-ex1", "duration": 3, "dumbells": [30,25] },
+        { "name": "c1-ex2", "duration": 6, "dumbells": [5,5] },
+        { "name": "c1-ex3", "duration": 13, "dumbells": [10,10] }
+      ]
+    }
+  ]
+}
