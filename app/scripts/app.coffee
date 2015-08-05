@@ -14,7 +14,7 @@ angular.module('gymsym', [
     templateUrl: 'views/simulation.html'
     resolve:
       SimulationDetails: ['$stateParams', 'SimulationApi', ($stateParams, SimulationApi) ->
-        SimulationApi.get id: $stateParams.simulationId
+        SimulationApi.get(id: $stateParams.simulationId).$promise
       ]
     controller: 'SimulationCtrl'
 

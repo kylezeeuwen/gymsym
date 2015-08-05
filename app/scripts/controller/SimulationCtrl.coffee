@@ -1,6 +1,6 @@
 angular.module('gymsym').controller 'SimulationCtrl', ($scope, SimulationDetails, Dumbell, Rack, Gym, Client, $timeout, $interval, SimulationApi) ->
 
-  console.log SimulationDetails
+  Client.resetIdCounter()
 
   $scope.intervalLength = 400 #milliseconds #@TODO configurable via UI
   $scope.rackConfig = SimulationDetails.rack
