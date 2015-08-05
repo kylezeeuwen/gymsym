@@ -1,8 +1,8 @@
 describe 'RackSpec:', ->
 
-  beforeEach -> 
+  beforeEach ->
     window.angular.mock.module 'gymsym'
-  
+
   beforeEach inject (_Dumbell_, _Rack_) ->
     @Rack = _Rack_
     @Dumbell = _Dumbell_
@@ -34,7 +34,7 @@ describe 'RackSpec:', ->
 
     it 'throws error on non numeric label', ->
       expect(@makeCallConstructorFunction('six')).toThrow new Error "invalid label 'six'"
-    
+
   #XXX: Todo add code to prevent dumbell instance from being added twice
   #or being in same rack at once
 
@@ -51,12 +51,12 @@ describe 'RackSpec:', ->
 
     it 'puts dumbell in specified slot', ->
       @rack.putDumbell(1, @dumbell)
-      expect(@rack.spaces[1]).toEqual { label: 2, dumbell: @dumbell }
-      expect(@rack.spaces[0]).toEqual { label: 1, dumbell: null }
+      expect(@rack.spaces[1]).toEqual { label: 2, dumbell: @dumbell, fresh: true }
+      expect(@rack.spaces[0]).toEqual { label: 1, dumbell: null, fresh: false }
 
     it 'throws error if slot is taken', ->
       expect(@makeCallPutDumbellFunction 0, @dumbell).toThrow new Error 'space full'
-      
+
     it 'throws error if non-dumbell is provided', ->
       expect(@makeCallPutDumbellFunction 1, 'poop').toThrow new Error 'invalid dumbell call putDumbell(index,dumbell)'
 
@@ -66,7 +66,7 @@ describe 'RackSpec:', ->
     it 'throws error if slot is negative', ->
       expect(@makeCallPutDumbellFunction -1, @dumbell).toThrow new Error "slotIndex '-1' out of range"
 
-    it 'throws error if slot is greater than numSlots', ->    
+    it 'throws error if slot is greater than numSlots', ->
       expect(@makeCallPutDumbellFunction 2, @dumbell).toThrow new Error "slotIndex '2' out of range"
 
   #XXX TODO test getEmptySlotsForDumbell
@@ -114,7 +114,7 @@ describe 'RackSpec:', ->
     it 'removes the dumbell from the rack', ->
       @rack.putDumbell 0, @dumbell
       dumbell = @rack.takeFromSlot 0
-      expect(@rack.spaces[0]).toEqual { label: 1, dumbell: null }
+      expect(@rack.spaces[0]).toEqual { label: 1, dumbell: null, fresh: true }
 
     it 'leaves the spaces array the same length', ->
       @rack.putDumbell 0, @dumbell
@@ -123,26 +123,27 @@ describe 'RackSpec:', ->
 
     it 'throws error if slot is empty', ->
       expect(@makeCallTakeFromSlotFunction 0).toThrow new Error 'space empty'
-      
+
     it 'throws error if slot is non numeric', ->
       expect(@makeCallTakeFromSlotFunction 'dogs').toThrow new Error "invalid slotIndex 'NaN'"
 
     it 'throws error if slot is negative', ->
       expect(@makeCallTakeFromSlotFunction -1).toThrow new Error "slotIndex '-1' out of range"
 
-    it 'throws error if slot is greater than numSlots', ->    
+    it 'throws error if slot is greater than numSlots', ->
       expect(@makeCallTakeFromSlotFunction 2).toThrow new Error "slotIndex '2' out of range"
- 
+
   describe 'takeDumbells:', ->
 
     beforeEach ->
       @rack = @Rack.create 0, 1, 2
 
     it 'gets multiple dumbells if they are present', ->
-      dumbell0 =  @Dumbell.create 10    
-      dumbell1 =  @Dumbell.create 10    
+      dumbell0 =  @Dumbell.create 10
+      dumbell1 =  @Dumbell.create 10
       @rack.putDumbell 0, dumbell0
       @rack.putDumbell 1, dumbell1
+      @rack.advanceTime 1
       dumbells = @rack.takeDumbells [10,10]
       expect(dumbells).toEqual [dumbell0,dumbell1]
       expect(@rack.getEmptySlotsForDumbell()).toEqual [0,1,2]
@@ -152,39 +153,52 @@ describe 'RackSpec:', ->
         theRack = @rack
         return ->
           theRack.takeDumbells [10,10]
-      
+
       expect(@throwsFunction()).toThrow new Error "cannot takeFirstDumbellWithWeight(10): no dumbell available"
 
   describe 'hasWeights:', ->
+
     beforeEach ->
       @rack = @Rack.create 1, 2, 3, 4
       @rack.putDumbell 0, @Dumbell.create 10
       @rack.putDumbell 1, @Dumbell.create 10
       @rack.putDumbell 2, @Dumbell.create 5
 
-    it 'returns true if empty array passed', ->  
-      expect(@rack.hasWeights []).toBe true
+    describe 'weights recently placed', ->
 
-    it 'returns true if single weight is present', ->  
-      expect(@rack.hasWeights [10]).toBe true
-      
-    it 'returns false if the weight is not present', ->
-      expect(@rack.hasWeights [1]).toBe false
+      it 'are not available until after one advanceTime', ->
+        expect(@rack.hasWeights [10]).toBe false
+        @rack.advanceTime 1
+        expect(@rack.hasWeights [10]).toBe true
 
-    it 'returns true if multiple weights are present', ->  
-      expect(@rack.hasWeights [10, 10]).toBe true
-      
-    it 'returns false if the some are present and some are not', ->
-      expect(@rack.hasWeights [10, 4]).toBe false
+    describe 'weights are not recently placed', ->
+      beforeEach ->
+        @rack.advanceTime 1
+
+      it 'returns true if empty array passed', ->
+        expect(@rack.hasWeights []).toBe true
+
+      it 'returns true if single weight is present', ->
+        expect(@rack.hasWeights [10]).toBe true
+
+      it 'returns false if the weight is not present', ->
+        expect(@rack.hasWeights [1]).toBe false
+
+      it 'returns true if multiple weights are present', ->
+        expect(@rack.hasWeights [10, 10]).toBe true
+
+      it 'returns false if the some are present and some are not', ->
+        expect(@rack.hasWeights [10, 4]).toBe false
 
 
   describe 'getSlotIndexesForWeight:', ->
-    
+
     beforeEach ->
       @rack = @Rack.create 1, 2, 3, 4
       @rack.putDumbell 0, @Dumbell.create 10
       @rack.putDumbell 1, @Dumbell.create 10
       @rack.putDumbell 2, @Dumbell.create 5
+      @rack.advanceTime 1
 
     it 'returns array of indexes for weights that are present', ->
       expect(@rack.getSlotIndexesForWeight 10).toEqual [0,1]
@@ -196,7 +210,7 @@ describe 'RackSpec:', ->
       rack = @Rack.create 1, 2
       rack.putDumbell 1, @Dumbell.create 10
 
-      expect(rack.dump()).toEqual [
-        { label: 1, weight: null, index: 0, id: '1-0' }
-        { label: 2, weight: 10, index: 1, id: '1-1' }
-      ]
+      expect(rack.dump()[0]).toEqual { label: 1, weight: null, index: 0, id: '1-0' }
+
+      expect(JSON.stringify rack.dump()[1].dumbell).toEqual JSON.stringify { props: { weight: 10 }, uniqId: 1 }
+

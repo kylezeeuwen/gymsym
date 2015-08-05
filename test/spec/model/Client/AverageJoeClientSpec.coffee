@@ -1,8 +1,8 @@
 describe 'AverageJoeClient:', ->
 
-  beforeEach -> 
+  beforeEach ->
     window.angular.mock.module 'gymsym'
-  
+
   beforeEach inject (_Client_, _Rack_, _Dumbell_) ->
     @Client = _Client_
     @Rack = _Rack_
@@ -23,9 +23,9 @@ describe 'AverageJoeClient:', ->
       @client.returnDumbells()
 
       expect(@rack.spaces).toEqual [
-        { label: 2, dumbell: null }
-        { label: 2, dumbell: null }
-        { label: 1, dumbell: @d1 }
+        { label: 2, dumbell: null, fresh: false }
+        { label: 2, dumbell: null, fresh: false }
+        { label: 1, dumbell: @d1, fresh: true }
       ]
 
     it 'client will put the dumbells in first available spot if the right spot is not available', ->
@@ -34,9 +34,9 @@ describe 'AverageJoeClient:', ->
       @client.returnDumbells()
 
       expect(@rack.spaces).toEqual [
-        { label: 2, dumbell: @d1 }
-        { label: 2, dumbell: null }
-        { label: 1, dumbell: @d2 }
+        { label: 2, dumbell: @d1, fresh: true }
+        { label: 2, dumbell: null, fresh: false }
+        { label: 1, dumbell: @d2, fresh: false }
       ]
 
     it 'client will throw error if there is no space for weight', ->

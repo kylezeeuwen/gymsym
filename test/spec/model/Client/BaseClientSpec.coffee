@@ -1,8 +1,8 @@
 describe 'BaseClientSpec (via AverageJoe child class):', ->
 
-  beforeEach -> 
+  beforeEach ->
     window.angular.mock.module 'gymsym'
-  
+
   beforeEach inject (_Client_, _Rack_, _Dumbell_) ->
     @Client = _Client_
     @Rack = _Rack_
@@ -64,7 +64,7 @@ describe 'BaseClientSpec (via AverageJoe child class):', ->
     it 'entries must have numeric duration', ->
       plan = [{ name: 'ex1', duration: 'dogs', dumbells: [1] }]
       expect(@makeThrowsFn plan).toThrow new Error "workoutPlan[0] non-numeric duration"
-    
+
     it 'entries must have dumbells array', ->
       plan = [{ name: 'ex1', duration: 4, dumbells: 'dogs' }]
       expect(@makeThrowsFn plan).toThrow new Error "workoutPlan[0] dumbells must be array"
@@ -80,6 +80,7 @@ describe 'BaseClientSpec (via AverageJoe child class):', ->
       beforeEach ->
         @rack = @Rack.create 1
         @rack.putDumbell 0, @Dumbell.create 1
+        @rack.advanceTime 1
         @workoutPlan = [{ name: 'c1-ex1', duration: 1, dumbells: [1] }]
         @client = @Client.create 'c1', 'AverageJoe', @workoutPlan
         @client.startWorkout @rack
@@ -99,13 +100,14 @@ describe 'BaseClientSpec (via AverageJoe child class):', ->
         @rack.takeFromSlot 0
         expect(@client.status).toBe 'idle'
         @client.advanceTime 1
-        expect(@client.status).toBe 'idle'
-  
+        expect(@client.status).toBe 'waiting'
+
     describe 'from exercising state:', ->
 
       beforeEach ->
         @rack = @Rack.create 1
         @rack.putDumbell 0, @Dumbell.create 1
+        @rack.advanceTime 1
         @workoutPlan = [{ name: 'c1-ex1', duration: 2, dumbells: [1] }]
         @client = @Client.create 'c1', 'AverageJoe', @workoutPlan
         @client.startWorkout @rack
