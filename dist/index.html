@@ -22,8 +22,7 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div class="container-fluid no-padding" ui-view="body">
-    </div>
+    <div class="container-fluid no-padding" ui-view></div>
 
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->
@@ -34,6 +33,7 @@
     <script src="bower_components/d3/d3.js"></script>
     <script src="bower_components/lodash/dist/lodash.compat.js"></script>
     <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -56,8 +56,7 @@
     <script src="scripts/app.js"></script>
 
     <!-- controllers -->
-    <script src="scripts/controller/MainCtrl.js"></script>
-    <script src="scripts/controller/SimpleCtrl.js"></script>
+    <script src="scripts/controller/SimulationCtrl.js"></script>
     <!-- controllers -->
 
     <!-- directives -->
@@ -70,11 +69,17 @@
     <script src="scripts/model/Client/BaseClient.js"></script>
     <script src="scripts/model/Client/AverageJoeClient.js"></script>
     <script src="scripts/model/Client/RandomClient.js"></script>
-    
+
     <script src="scripts/model/Dumbell.js"></script>
     <script src="scripts/model/Gym.js"></script>
     <script src="scripts/model/Rack.js"></script>
     <!-- models -->
+
+    <!-- models -->
+    <script src="scripts/api/SimulationApi.js"></script>
+    <!-- models -->
+
+
     <!-- endbuild -->
 
 </body>

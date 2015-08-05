@@ -12,6 +12,7 @@
       }
 
       RandomClient.create = function(id, name, program) {
+        console.log("RandomClient");
         return new RandomClient(id, name, program);
       };
 

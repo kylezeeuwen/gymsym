@@ -1,23 +1,25 @@
 'use strict'
 
 angular.module('gymsym', [
+  'ngResource'
   'ui.router'
 ]).config ($urlRouterProvider, $stateProvider) ->
 
-  $urlRouterProvider.when '', '/main'
+  $urlRouterProvider.when '', '/intro'
 
-  $urlRouterProvider.otherwise '/main'
+  $urlRouterProvider.otherwise '/intro'
 
-  $stateProvider.state 'main',
-    url: '/main'
-    views:
-      body:
-        templateUrl: 'views/main.html'
+  $stateProvider.state 'simulation',
+    url: '/simulation/:simulationId'
+    templateUrl: 'views/simulation.html'
+    resolve:
+      SimulationDetails: ['$stateParams', 'SimulationApi', ($stateParams, SimulationApi) ->
+        SimulationApi.get id: $stateParams.simulationId
+      ]
+    controller: 'SimulationCtrl'
 
-  $stateProvider.state 'simple',
-    url: '/simple'
-    views:
-      body:
-        templateUrl: 'views/simple.html'
+  $stateProvider.state 'intro',
+    url: '/intro'
+    templateUrl: 'views/intro.html'
 
   return
