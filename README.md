@@ -3,6 +3,9 @@ visual sim to determine ideal behaviour for putting dumbells back on the rack
 
 See the project gitpage here : http://kylezeeuwen.github.io/gymsym/
 
+> Over the last two days I completed "Milestone 3", which made the visualization much easier to understand and added some routing to the mix. However, at present there is a bug I haven't had a chance to investigate. You will get the feared angular fail {{}} did not interpolate content error. Simply refresh, and everything will be good.
+
+
 ## install notes
 
 1. You must have gulp installed globally via `sudo npm install -g gulp`
